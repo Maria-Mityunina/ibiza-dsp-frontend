@@ -75,7 +75,7 @@ const AnalyticsPage: React.FC = () => {
   ]
 
   return (
-    <div className="py-6 space-y-6 min-h-screen bg-slate-50">
+    <div className="py-6 space-y-6 min-h-screen bg-slate-50 max-w-full overflow-x-hidden">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -87,48 +87,7 @@ const AnalyticsPage: React.FC = () => {
           <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
             <BarChart3 className="w-5 h-5 text-white" />
           </div>
-          <div className="flex space-x-6 text-sm">
-            <button 
-              onClick={() => setSelectedTab('analytics')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedTab === 'analytics' 
-                  ? 'bg-slate-900 text-white' 
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              {t('header.dsp_analytics')}
-            </button>
-            <button 
-              onClick={() => setSelectedTab('campaigns')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedTab === 'campaigns' 
-                  ? 'bg-slate-900 text-white' 
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              {t('header.campaign_management')}
-            </button>
-            <button 
-              onClick={() => setSelectedTab('audience')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedTab === 'audience' 
-                  ? 'bg-slate-900 text-white' 
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              {t('header.audience_insights')}
-            </button>
-            <button 
-              onClick={() => setSelectedTab('fraud')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedTab === 'fraud' 
-                  ? 'bg-slate-900 text-white' 
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              {t('header.fraud_detection')}
-            </button>
-          </div>
+          <h1 className="text-2xl font-bold text-slate-900">{t('nav.analytics')}</h1>
         </div>
         
         <div className="flex items-center space-x-4">
@@ -143,10 +102,7 @@ const AnalyticsPage: React.FC = () => {
             {isRealTimeActive ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
             <span>{t('header.real_time')}</span>
           </button>
-          <div className="text-sm text-slate-500">{t('header.dsp_manager')}</div>
-          <div className="w-8 h-8 bg-slate-900 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-medium">DM</span>
-          </div>
+
         </div>
       </motion.div>
 
@@ -211,7 +167,7 @@ const AnalyticsPage: React.FC = () => {
 
       {/* Main KPI Grid */}
       <div className="px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
           {/* Total Impressions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -359,7 +315,7 @@ const AnalyticsPage: React.FC = () => {
 
       {/* Secondary KPIs */}
       <div className="px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6">
           {/* CPC */}
           <motion.div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
             <div className="flex items-center space-x-2 mb-2">
@@ -436,7 +392,7 @@ const AnalyticsPage: React.FC = () => {
 
       {/* Device & Geo Analytics */}
       <div className="px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
           {/* Device Performance */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -556,7 +512,7 @@ const AnalyticsPage: React.FC = () => {
                 <p className="text-slate-400 text-sm">Bids/sec</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="text-center">
                   <p className="text-xl font-bold text-emerald-400">89</p>
                   <p className="text-slate-400 text-xs">Win Rate %</p>
@@ -587,7 +543,7 @@ const AnalyticsPage: React.FC = () => {
 
       {/* Main Charts Row */}
       <div className="px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
           {/* Performance Radar */}
           <RadarChart
             data={performanceRadarData}

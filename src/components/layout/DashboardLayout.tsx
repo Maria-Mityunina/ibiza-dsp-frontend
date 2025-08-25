@@ -45,10 +45,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           className="flex-1 flex flex-col min-w-0 pr-6"
         >
           {/* Header */}
-          <Header />
+          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
           
           {/* Page content */}
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1 overflow-auto max-w-full overflow-x-hidden">
             {/* Breadcrumb */}
             <div className="px-8 py-6 border-b border-black/5">
               <div className="text-gray-600">
