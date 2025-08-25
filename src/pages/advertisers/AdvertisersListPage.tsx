@@ -19,7 +19,6 @@ interface Advertiser {
 const AdvertisersListPage: React.FC = () => {
   const { t } = useLanguageStore()
   const { success } = useToast()
-  
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [advertisers, setAdvertisers] = useState<Advertiser[]>([
     {

@@ -48,17 +48,34 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const validateForm = () => {
+  const handleInputChange = (field: keyof AdvertiserFormData, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
     if (!formData.name.trim()) newErrors.name = t('form.required_field')
     if (!formData.legalName.trim()) newErrors.legalName = t('form.required_field')
-    if (!formData.inn.trim() || formData.inn.length !== 12) newErrors.inn = t('form.invalid_inn')
-    if (!formData.kpp.trim() || formData.kpp.length !== 9) newErrors.kpp = t('form.invalid_kpp')
-    if (!formData.ogrn.trim() || formData.ogrn.length !== 15) newErrors.ogrn = t('form.invalid_ogrn')
+    if (!formData.inn.trim()) newErrors.inn = t('form.required_field')
+    else if (!/^\d{12}$/.test(formData.inn)) newErrors.inn = t('form.invalid_inn')
+    
+    if (!formData.kpp.trim()) newErrors.kpp = t('form.required_field')
+    else if (!/^\d{9}$/.test(formData.kpp)) newErrors.kpp = t('form.invalid_kpp')
+    
+    if (!formData.ogrn.trim()) newErrors.ogrn = t('form.required_field')
+    else if (!/^\d{15}$/.test(formData.ogrn)) newErrors.ogrn = t('form.invalid_ogrn')
+    
     if (!formData.legalAddress.trim()) newErrors.legalAddress = t('form.required_field')
-    if (!formData.bik.trim() || formData.bik.length !== 9) newErrors.bik = t('form.invalid_bik')
-    if (!formData.account.trim() || formData.account.length !== 20) newErrors.account = t('form.invalid_account')
+    if (!formData.bik.trim()) newErrors.bik = t('form.required_field')
+    else if (!/^\d{9}$/.test(formData.bik)) newErrors.bik = t('form.invalid_bik')
+    
+    if (!formData.account.trim()) newErrors.account = t('form.required_field')
+    else if (!/^\d{20}$/.test(formData.account)) newErrors.account = t('form.invalid_account')
+    
     if (!formData.contractNumber.trim()) newErrors.contractNumber = t('form.required_field')
     if (!formData.contractDate.trim()) newErrors.contractDate = t('form.required_field')
 
@@ -69,33 +86,29 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (validateForm()) {
-      onSubmit(formData)
-      success(t('advertiser.created_successfully'))
-      onClose()
-      setFormData({
-        name: '',
-        legalName: '',
-        inn: '',
-        kpp: '',
-        ogrn: '',
-        legalAddress: '',
-        bik: '',
-        account: '',
-        contractNumber: '',
-        contractDate: '',
-        useAutoMarking: false
-      })
-    } else {
+    if (!validateForm()) {
       error(t('form.validation_error'))
+      return
     }
-  }
 
-  const handleInputChange = (field: keyof AdvertiserFormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
-    }
+    onSubmit(formData)
+    success('Рекламодатель успешно создан')
+    onClose()
+    
+    // Reset form
+    setFormData({
+      name: '',
+      legalName: '',
+      inn: '',
+      kpp: '',
+      ogrn: '',
+      legalAddress: '',
+      bik: '',
+      account: '',
+      contractNumber: '',
+      contractDate: '',
+      useAutoMarking: false
+    })
   }
 
   if (!isOpen) return null
@@ -106,11 +119,11 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
       >
-        {/* Header */}
+        {/* Simple Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">{t('advertiser.create_new')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Создать рекламодателя</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -121,11 +134,11 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Наименование рекламодателя */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.advertiser_name')} *
+                Наименование рекламодателя *
               </label>
               <input
                 type="text"
@@ -134,8 +147,7 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
                   errors.name ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder={t('form.enter_advertiser_name')}
-                maxLength={64}
+                placeholder="Введите наименование рекламодателя"
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
@@ -143,7 +155,7 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
             {/* Наименование юр лица */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.legal_name')} *
+                Наименование юр лица *
               </label>
               <input
                 type="text"
@@ -152,8 +164,7 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
                   errors.legalName ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder={t('form.enter_legal_name')}
-                maxLength={64}
+                placeholder="Введите наименование юр лица"
               />
               {errors.legalName && <p className="text-red-500 text-sm mt-1">{errors.legalName}</p>}
             </div>
@@ -161,12 +172,12 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
             {/* ИНН */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.inn')} *
+                ИНН *
               </label>
               <input
                 type="text"
                 value={formData.inn}
-                onChange={(e) => handleInputChange('inn', e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => handleInputChange('inn', e.target.value.replace(/\D/g, '').slice(0, 12))}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
                   errors.inn ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -179,12 +190,12 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
             {/* КПП */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.kpp')} *
+                КПП *
               </label>
               <input
                 type="text"
                 value={formData.kpp}
-                onChange={(e) => handleInputChange('kpp', e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => handleInputChange('kpp', e.target.value.replace(/\D/g, '').slice(0, 9))}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
                   errors.kpp ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -197,12 +208,12 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
             {/* ОГРН/ОГРНИП */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.ogrn')} *
+                ОГРН/ОГРНИП *
               </label>
               <input
                 type="text"
                 value={formData.ogrn}
-                onChange={(e) => handleInputChange('ogrn', e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => handleInputChange('ogrn', e.target.value.replace(/\D/g, '').slice(0, 15))}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
                   errors.ogrn ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -212,15 +223,32 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
               {errors.ogrn && <p className="text-red-500 text-sm mt-1">{errors.ogrn}</p>}
             </div>
 
+            {/* Юридический адрес */}
+            <div className="lg:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Юридический адрес *
+              </label>
+              <textarea
+                value={formData.legalAddress}
+                onChange={(e) => handleInputChange('legalAddress', e.target.value)}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
+                  errors.legalAddress ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Введите юридический адрес"
+                rows={3}
+              />
+              {errors.legalAddress && <p className="text-red-500 text-sm mt-1">{errors.legalAddress}</p>}
+            </div>
+
             {/* БИК */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.bik')} *
+                БИК *
               </label>
               <input
                 type="text"
                 value={formData.bik}
-                onChange={(e) => handleInputChange('bik', e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => handleInputChange('bik', e.target.value.replace(/\D/g, '').slice(0, 9))}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
                   errors.bik ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -233,12 +261,12 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
             {/* р/с */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.account')} *
+                р/с *
               </label>
               <input
                 type="text"
                 value={formData.account}
-                onChange={(e) => handleInputChange('account', e.target.value.replace(/\D/g, ''))}
+                onChange={(e) => handleInputChange('account', e.target.value.replace(/\D/g, '').slice(0, 20))}
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
                   errors.account ? 'border-red-500' : 'border-gray-300'
                 }`}
@@ -251,7 +279,7 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
             {/* Номер договора */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.contract_number')} *
+                Номер договора *
               </label>
               <input
                 type="text"
@@ -260,8 +288,7 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
                 className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
                   errors.contractNumber ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder={t('form.enter_contract_number')}
-                maxLength={20}
+                placeholder="Введите номер договора"
               />
               {errors.contractNumber && <p className="text-red-500 text-sm mt-1">{errors.contractNumber}</p>}
             </div>
@@ -269,7 +296,7 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
             {/* Дата заключения договора */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.contract_date')} *
+                Дата заключения договора *
               </label>
               <input
                 type="date"
@@ -281,54 +308,35 @@ const CreateAdvertiserForm: React.FC<CreateAdvertiserFormProps> = ({
               />
               {errors.contractDate && <p className="text-red-500 text-sm mt-1">{errors.contractDate}</p>}
             </div>
+
+            {/* Использовать автомаркировку */}
+            <div className="lg:col-span-2">
+              <label className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.useAutoMarking}
+                  onChange={(e) => handleInputChange('useAutoMarking', e.target.checked)}
+                  className="w-5 h-5 text-slate-600 border-gray-300 rounded focus:ring-slate-500"
+                />
+                <span className="text-gray-700">Использовать автомаркировку в ОРД</span>
+              </label>
+            </div>
           </div>
 
-          {/* Юридический адрес */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('form.legal_address')} *
-            </label>
-            <textarea
-              value={formData.legalAddress}
-              onChange={(e) => handleInputChange('legalAddress', e.target.value)}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
-                errors.legalAddress ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder={t('form.enter_legal_address')}
-              rows={3}
-              maxLength={500}
-            />
-            {errors.legalAddress && <p className="text-red-500 text-sm mt-1">{errors.legalAddress}</p>}
-          </div>
-
-          {/* Автомаркировка в ОРД */}
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="autoMarking"
-              checked={formData.useAutoMarking}
-              onChange={(e) => handleInputChange('useAutoMarking', e.target.checked)}
-              className="w-5 h-5 text-slate-600 border-gray-300 rounded focus:ring-slate-500"
-            />
-            <label htmlFor="autoMarking" className="text-sm font-medium text-gray-700">
-              {t('form.use_auto_marking')}
-            </label>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+          {/* Buttons */}
+          <div className="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              {t('action.cancel')}
+              Отменить
             </button>
             <button
               type="submit"
               className="px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
             >
-              {t('action.save')}
+              Сохранить
             </button>
           </div>
         </form>

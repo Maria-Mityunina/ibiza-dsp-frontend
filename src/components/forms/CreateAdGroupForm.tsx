@@ -203,45 +203,19 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
       >
-        {/* Header with advertiser info */}
-        <div className="border-b border-gray-200">
-          <div className="flex items-center justify-between p-4 bg-gray-50">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{advertiserName}</span>
-              <span className="text-sm font-medium text-green-600">{advertiserBudget}</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{t('nav.campaigns')}</span>
-              <span className="text-sm text-gray-600">{t('nav.statistics')}</span>
-              <span className="text-sm text-gray-600">{t('action.exit')}</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between p-6">
-            <h2 className="text-2xl font-bold text-gray-900">{t('adgroup.create_new')}</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+        {/* Simple Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">{t('adgroup.create_new')}</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        {/* Side notes */}
-        <div className="flex">
-          <div className="hidden lg:block w-48 bg-red-50 p-4 text-sm">
-            <div className="bg-red-100 p-3 rounded-lg mb-4">
-              <p className="text-red-700 font-medium">{t('form.note_segments')}</p>
-              <p className="text-red-600 text-xs mt-1">{t('form.add_minus_segments')}</p>
-            </div>
-            <div className="bg-red-100 p-3 rounded-lg">
-              <p className="text-red-700 font-medium">{t('form.note_exclude')}</p>
-              <p className="text-red-600 text-xs mt-1">{t('form.exclude_groups')}</p>
-            </div>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="flex-1 p-6 space-y-6">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Площадка размещения */}
               <div>
@@ -646,8 +620,7 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                 {t('action.save')}
               </button>
             </div>
-          </form>
-        </div>
+        </form>
       </motion.div>
     </div>
   )

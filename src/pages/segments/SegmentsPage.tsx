@@ -59,13 +59,12 @@ const SegmentsPage: React.FC = () => {
         <div className="flex flex-col">
           <div className="flex items-center space-x-4 mb-4 mt-6">
             {canCreateSegment && (
-              <Link
-                to="/segments/upload"
-                className="inline-flex items-center px-4 py-2 bg-white border border-black text-black text-sm font-normal rounded-lg hover:bg-gray-50 transition-colors"
+              <button
+                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-medium"
               >
-                <Upload className="h-4 w-4 mr-2" />
+                <Upload className="h-4 w-4" />
                 Загрузить сегмент
-              </Link>
+              </button>
             )}
           </div>
           <div>

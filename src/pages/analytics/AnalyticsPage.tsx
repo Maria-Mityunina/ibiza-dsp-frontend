@@ -37,6 +37,7 @@ import {
 // Import components
 import RadarChart from '@components/charts/RadarChart'
 import HeatmapCalendar from '@components/charts/HeatmapCalendar'
+import { InteractiveFunnelChart, LiveMetricsChart, ScatterPlotChart } from '@components/charts'
 import TeamCard from '@components/ui/TeamCard'
 import { addDays } from 'date-fns'
 

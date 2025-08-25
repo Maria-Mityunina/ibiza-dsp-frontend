@@ -120,38 +120,49 @@ const AdGroupsListPage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <motion.div 
+      className="max-w-full overflow-x-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('nav.adgroups')}</h1>
-          <p className="text-gray-600 mt-1">{t('adgroup.manage_adgroups')}</p>
+          <h1 className="text-2xl lg:text-3xl font-light text-black mb-2">
+            {t('nav.adgroups')}
+          </h1>
+          <p className="text-gray-600 font-light">
+            Управление группами объявлений
+          </p>
         </div>
         
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={() => setShowCreateForm(true)}
-          className="flex items-center space-x-2 px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
+          className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-medium"
         >
-          <Plus className="w-5 h-5" />
-          <span>{t('adgroup.create_new')}</span>
-        </motion.button>
+          <Plus className="h-4 w-4" />
+          Создать группу объявлений
+        </button>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Target className="w-5 h-5 text-blue-600" />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <motion.div 
+          className="bg-blue-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <Target className="h-5 w-5 text-blue-600" />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('adgroup.total_groups')}</p>
-              <p className="text-2xl font-bold text-gray-900">{adGroups.length}</p>
-            </div>
+            <span className="text-sm text-gray-600">Всего групп</span>
           </div>
-        </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {adGroups.length}
+          </div>
+        </motion.div>
         
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center space-x-3">
@@ -181,26 +192,32 @@ const AdGroupsListPage: React.FC = () => {
           </div>
         </div>
         
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-orange-600" />
+        <motion.div 
+          className="bg-orange-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-orange-100 rounded-xl">
+              <DollarSign className="h-5 w-5 text-orange-600" />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.spend')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                ${adGroups.reduce((sum, group) => sum + group.spent, 0).toLocaleString()}
-              </p>
-            </div>
+            <span className="text-sm text-gray-600">Потрачено</span>
           </div>
-        </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            ${adGroups.reduce((sum, group) => sum + group.spent, 0).toLocaleString()}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Ad Groups List Header */}
+      <div className="mb-6">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">
+          Все группы объявлений
+        </h2>
       </div>
 
       {/* Ad Groups List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">{t('adgroup.all_adgroups')}</h2>
-        </div>
+      <div className="space-y-4">
         
         <div className="divide-y divide-gray-200">
           {adGroups.map((adGroup) => {
@@ -298,7 +315,7 @@ const AdGroupsListPage: React.FC = () => {
         onClose={() => setShowCreateForm(false)}
         onSubmit={handleCreateAdGroup}
       />
-    </div>
+    </motion.div>
   )
 }
 

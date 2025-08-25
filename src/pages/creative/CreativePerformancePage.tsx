@@ -177,7 +177,20 @@ const CreativePerformancePage: React.FC = () => {
           </button>
           
           <button 
-            onClick={() => console.log('Upload creative modal...')}
+            onClick={() => {
+              // Implement upload creative functionality
+              const input = document.createElement('input')
+              input.type = 'file'
+              input.accept = 'image/*,video/*'
+              input.onchange = (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0]
+                if (file) {
+                  console.log('Uploading creative file:', file.name)
+                  // Here you would implement the actual upload logic
+                }
+              }
+              input.click()
+            }}
             className="px-3 py-2 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-800 transition-colors"
           >
             {t('ui.upload_creative')}

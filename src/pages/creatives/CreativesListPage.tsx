@@ -29,30 +29,48 @@ const CreativesListPage: React.FC = () => {
   const [creatives, setCreatives] = useState<Creative[]>([
     {
       id: '1',
-      name: 'Текстовый баннер 1',
-      type: 'text',
+      name: 'Большой крео 1',
+      type: 'image',
       status: 'active',
-      title: 'Быстрое такси',
-      text: 'Заказывайте такси в приложении',
-      link: 'https://taxi-app.com',
+      title: 'Где лучше тусовать?',
+      text: 'Килограммы денег просто так...',
+      imageUrl: 'https://i.postimg.cc/L8QhXGqp/matinee-ibiza.jpg',
+      link: 'https://runavklube.com',
       cpm: 2.5,
-      impressions: 450000,
-      clicks: 9000,
-      ctr: 2.0,
-      spent: 1125
+      impressions: 2000,
+      clicks: 60,
+      ctr: 3.0,
+      spent: 4
     },
     {
       id: '2',
-      name: 'Изображение промо',
+      name: 'Большой крео 2',
       type: 'image',
-      status: 'active',
-      imageUrl: 'https://via.placeholder.com/300x169',
-      link: 'https://taxi-app.com/promo',
-      cpm: 3.2,
-      impressions: 280000,
-      clicks: 8400,
+      status: 'paused',
+      title: 'Где люди живут хипхопом!',
+      text: 'Где люди живут хипхопом!',
+      imageUrl: 'https://i.postimg.cc/kgHCxqPP/illuzion.jpg',
+      link: 'https://runavklube.com',
+      cpm: 2.5,
+      impressions: 50000,
+      clicks: 1500,
       ctr: 3.0,
-      spent: 896
+      spent: 100
+    },
+    {
+      id: '3',
+      name: 'Берхгайн',
+      type: 'image',
+      status: 'paused',
+      title: 'Если и нужен тебе ищи хмель...',
+      text: 'Если и нужен тебе ищи хмель...',
+      imageUrl: 'https://i.postimg.cc/yY8QNmJK/berghain.jpg',
+      link: 'https://runavklube.com',
+      cpm: 2.5,
+      impressions: 2000,
+      clicks: 60,
+      ctr: 3.0,
+      spent: 4
     },
     {
       id: '3',
@@ -131,38 +149,49 @@ const CreativesListPage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <motion.div 
+      className="max-w-full overflow-x-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('nav.creatives')}</h1>
-          <p className="text-gray-600 mt-1">{t('creative.manage_creatives')}</p>
+          <h1 className="text-2xl lg:text-3xl font-light text-black mb-2">
+            {t('nav.creatives')}
+          </h1>
+          <p className="text-gray-600 font-light">
+            Управление креативными материалами
+          </p>
         </div>
         
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={() => setShowCreateForm(true)}
-          className="flex items-center space-x-2 px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
+          className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-medium"
         >
-          <Plus className="w-5 h-5" />
-          <span>{t('creative.create_new')}</span>
-        </motion.button>
+          <Plus className="h-4 w-4" />
+          Создать креатив
+        </button>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <ImageIcon className="w-5 h-5 text-blue-600" />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <motion.div 
+          className="bg-blue-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <ImageIcon className="h-5 w-5 text-blue-600" />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('creative.total_creatives')}</p>
-              <p className="text-2xl font-bold text-gray-900">{creatives.length}</p>
-            </div>
+            <span className="text-sm text-gray-600">Всего креативов</span>
           </div>
-        </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {creatives.length}
+          </div>
+        </motion.div>
         
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center space-x-3">
@@ -192,26 +221,32 @@ const CreativesListPage: React.FC = () => {
           </div>
         </div>
         
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-orange-600" />
+        <motion.div 
+          className="bg-orange-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-orange-100 rounded-xl">
+              <DollarSign className="h-5 w-5 text-orange-600" />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.spend')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                ${creatives.reduce((sum, creative) => sum + creative.spent, 0).toLocaleString()}
-              </p>
-            </div>
+            <span className="text-sm text-gray-600">Потрачено</span>
           </div>
-        </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            ${creatives.reduce((sum, creative) => sum + creative.spent, 0).toLocaleString()}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Creatives List Header */}
+      <div className="mb-6">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">
+          Все креативы
+        </h2>
       </div>
 
       {/* Creatives List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">{t('creative.all_creatives')}</h2>
-        </div>
+      <div className="space-y-4">
         
         <div className="divide-y divide-gray-200">
           {creatives.map((creative) => {
@@ -328,7 +363,7 @@ const CreativesListPage: React.FC = () => {
         onClose={() => setShowCreateForm(false)}
         onSubmit={handleCreateCreative}
       />
-    </div>
+    </motion.div>
   )
 }
 
