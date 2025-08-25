@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer, Target } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Plus, Edit, Trash2, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer, Target } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
-import { CreateAdGroupForm } from '@components/forms'
+import { CreateAdGroupForm, EditAdGroupForm } from '@components/forms'
 
 interface AdGroup {
   id: string
@@ -21,8 +22,12 @@ interface AdGroup {
 const AdGroupsListPage: React.FC = () => {
   const { t } = useLanguageStore()
   const { success } = useToast()
+  const navigate = useNavigate()
+  const { advertiserId, campaignId } = useParams()
   
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [selectedAdGroup, setSelectedAdGroup] = useState<AdGroup | null>(null)
   const [adGroups, setAdGroups] = useState<AdGroup[]>([
     {
       id: '1',
@@ -77,6 +82,35 @@ const AdGroupsListPage: React.FC = () => {
     }
     
     setAdGroups(prev => [newAdGroup, ...prev])
+  }
+
+  const handleDeleteAdGroup = (adGroupId: string) => {
+    if (window.confirm('Вы уверены, что хотите удалить эту группу объявлений?')) {
+      setAdGroups(prev => prev.filter(adGroup => adGroup.id !== adGroupId))
+    }
+  }
+
+  const handleEditAdGroup = (data: any) => {
+    if (!selectedAdGroup) return
+    
+    const updatedAdGroup: AdGroup = {
+      ...selectedAdGroup,
+      name: data.name,
+      budget: parseInt(data.budget) || selectedAdGroup.budget,
+      targeting: `${data.region || ''}, ${data.phoneModel || ''}, ${data.language || ''}`.replace(/^,\s*|,\s*$/g, '')
+    }
+    
+    setAdGroups(prev => prev.map(adGroup => 
+      adGroup.id === selectedAdGroup.id ? updatedAdGroup : adGroup
+    ))
+    success('Группа объявлений успешно обновлена')
+    setSelectedAdGroup(null)
+    setShowEditForm(false)
+  }
+
+  const openEditForm = (adGroup: AdGroup) => {
+    setSelectedAdGroup(adGroup)
+    setShowEditForm(true)
   }
 
   const toggleAdGroupStatus = (id: string) => {
@@ -283,11 +317,25 @@ const AdGroupsListPage: React.FC = () => {
                     </button>
                     
                     <button
-                      onClick={() => {/* Handle edit */}}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openEditForm(adGroup)
+                      }}
                       className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                       title={t('action.edit')}
                     >
                       <Edit className="w-4 h-4" />
+                    </button>
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteAdGroup(adGroup.id)
+                      }}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Удалить"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                     
                     <button
@@ -314,6 +362,17 @@ const AdGroupsListPage: React.FC = () => {
         isOpen={showCreateForm}
         onClose={() => setShowCreateForm(false)}
         onSubmit={handleCreateAdGroup}
+      />
+
+      {/* Edit Ad Group Form */}
+      <EditAdGroupForm
+        isOpen={showEditForm}
+        onClose={() => {
+          setShowEditForm(false)
+          setSelectedAdGroup(null)
+        }}
+        onSubmit={handleEditAdGroup}
+        adGroup={selectedAdGroup}
       />
     </motion.div>
   )

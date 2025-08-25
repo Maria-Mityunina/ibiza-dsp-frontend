@@ -34,7 +34,7 @@ const RegisterPage: React.FC = () => {
       setError(null)
       
       // Здесь будет логика регистрации через API
-      console.log('Register data:', data)
+      // Register implementation
       
       // Имитация запроса
       await new Promise(resolve => setTimeout(resolve, 2000))

@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
       await login(data)
       notify.success('Успешный вход', 'Добро пожаловать в систему!')
     } catch (error) {
-      console.error('Login error:', error)
+      // Handle login error
     }
   }
 

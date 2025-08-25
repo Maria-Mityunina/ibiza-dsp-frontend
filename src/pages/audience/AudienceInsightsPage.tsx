@@ -98,7 +98,7 @@ const AudienceInsightsPage: React.FC = () => {
             <option value="retargeting">{t('audience.retargeting_pool')}</option>
           </select>
           <button 
-            onClick={() => console.log('Creating new segment...')}
+            onClick={() => notify.info('Создание сегмента', 'Функция в разработке')}
             className="px-3 py-2 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-800 transition-colors"
           >
             {t('audience.create_segment')}

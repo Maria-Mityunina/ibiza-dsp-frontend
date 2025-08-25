@@ -44,7 +44,7 @@ const EditCampaignPage: React.FC = () => {
   const onSubmit = async (data: EditCampaignFormData) => {
     try {
       setIsLoading(true)
-      console.log('Updating campaign:', id, data)
+      // Update campaign implementation
       await new Promise(resolve => setTimeout(resolve, 1000))
       notify.success('Изменения сохранены', 'Кампания успешно обновлена')
       navigate(`/advertisers/${advertiserId}/campaigns`)

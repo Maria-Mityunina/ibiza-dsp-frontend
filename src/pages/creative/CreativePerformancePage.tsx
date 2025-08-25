@@ -185,8 +185,7 @@ const CreativePerformancePage: React.FC = () => {
               input.onchange = (e) => {
                 const file = (e.target as HTMLInputElement).files?.[0]
                 if (file) {
-                  console.log('Uploading creative file:', file.name)
-                  // Here you would implement the actual upload logic
+                  // File upload implementation would go here
                 }
               }
               input.click()

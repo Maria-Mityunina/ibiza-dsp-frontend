@@ -48,24 +48,24 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
   const { success, error } = useToast()
   
   const [formData, setFormData] = useState<AdGroupFormData>({
-    platform: '',
+    platform: 'rustore',
     name: '',
     budget: '',
     startDate: '',
     endDate: '',
-    startTime: '',
-    endTime: '',
+    startTime: 'ad_groups',
+    endTime: 'all_day',
     userFrequencyLimit: '',
-    userFrequencyPeriod: '',
+    userFrequencyPeriod: 'day',
     adFrequencyLimit: '',
-    adFrequencyPeriod: '',
+    adFrequencyPeriod: 'day',
     clickLimit: '',
-    clickPeriod: '',
+    clickPeriod: 'day',
     segments: [],
-    phoneModel: '',
-    region: '',
-    language: '',
-    osVersion: '',
+    phoneModel: 'any',
+    region: 'all_russia',
+    language: 'ru',
+    osVersion: 'any_version',
     excludeAudience: false,
     excludeSegments: [],
     excludeRegions: [],
@@ -77,9 +77,7 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
   const [segmentFile, setSegmentFile] = useState<File | null>(null)
 
   const platformOptions = [
-    { value: 'rustore', label: 'RuStore' },
-    { value: 'yandex', label: 'Yandex Ads' },
-    { value: 'vk', label: 'VK Ads' }
+    { value: 'rustore', label: 'RuStore' }
   ]
 
   const periodOptions = [
@@ -91,45 +89,65 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
 
   const segmentOptions = [
     { value: 'add_new', label: t('form.add_new_segment') },
-    { value: 'segment_1', label: 'Segment 1' },
-    { value: 'segment_2', label: 'Segment 2' },
-    { value: 'segment_3', label: 'Segment 3' }
+    { value: 'young_adults', label: 'Молодежь 18-25' },
+    { value: 'middle_age', label: 'Средний возраст 26-40' },
+    { value: 'seniors', label: 'Старший возраст 40+' },
+    { value: 'gamers', label: 'Геймеры' },
+    { value: 'shoppers', label: 'Покупатели онлайн' },
+    { value: 'travelers', label: 'Путешественники' }
   ]
 
   const phoneModelOptions = [
-    { value: '', label: t('form.select_phone_model') },
+    { value: 'any', label: 'Любое устройство' },
     { value: 'iphone', label: 'iPhone' },
     { value: 'samsung', label: 'Samsung' },
-    { value: 'xiaomi', label: 'Xiaomi' }
+    { value: 'xiaomi', label: 'Xiaomi' },
+    { value: 'huawei', label: 'Huawei' },
+    { value: 'oppo', label: 'OPPO' }
   ]
 
   const regionOptions = [
-    { value: '', label: t('form.select_region') },
+    { value: 'all_russia', label: 'Вся Россия' },
     { value: 'moscow', label: t('region.moscow') },
     { value: 'spb', label: t('region.spb') },
-    { value: 'ekaterinburg', label: t('region.ekaterinburg') }
+    { value: 'ekaterinburg', label: t('region.ekaterinburg') },
+    { value: 'novosibirsk', label: 'Новосибирск' },
+    { value: 'kazan', label: 'Казань' }
   ]
 
   const languageOptions = [
-    { value: '', label: t('form.select_language') },
     { value: 'ru', label: t('language.russian') },
     { value: 'en', label: t('language.english') },
-    { value: 'es', label: t('language.spanish') }
+    { value: 'es', label: t('language.spanish') },
+    { value: 'de', label: 'Немецкий' },
+    { value: 'fr', label: 'Французский' }
   ]
 
   const osVersionOptions = [
-    { value: '', label: t('form.select_os_version') },
+    { value: 'any_version', label: 'Любая версия ОС' },
+    { value: 'ios_17', label: 'iOS 17+' },
     { value: 'ios_16', label: 'iOS 16+' },
     { value: 'ios_15', label: 'iOS 15+' },
+    { value: 'android_14', label: 'Android 14+' },
     { value: 'android_13', label: 'Android 13+' },
     { value: 'android_12', label: 'Android 12+' }
+  ]
+
+  const timeOptions = [
+    { value: 'ad_groups', label: t('form.ad_groups') },
+    { value: 'all_day', label: t('form.all_day') }
   ]
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
     if (!formData.name.trim()) newErrors.name = t('form.required_field')
+    else if (formData.name.length > 64) newErrors.name = 'Максимум 64 символа'
+    
     if (!formData.budget.trim()) newErrors.budget = t('form.required_field')
+    else if (!/^\d+$/.test(formData.budget)) newErrors.budget = 'Только цифры'
+    else if (formData.budget.length > 7) newErrors.budget = 'Максимум 7 цифр'
+    
     if (!formData.startDate.trim()) newErrors.startDate = t('form.required_field')
     if (!formData.endDate.trim()) newErrors.endDate = t('form.required_field')
     
@@ -138,6 +156,22 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
       if (new Date(formData.startDate) >= new Date(formData.endDate)) {
         newErrors.endDate = t('form.invalid_date_range')
       }
+    }
+
+    // Validate frequency limits
+    if (formData.userFrequencyLimit && (!/^\d+$/.test(formData.userFrequencyLimit) || formData.userFrequencyLimit.length > 8)) {
+      newErrors.userFrequencyLimit = 'Максимум 8 цифр'
+    }
+    if (formData.adFrequencyLimit && (!/^\d+$/.test(formData.adFrequencyLimit) || formData.adFrequencyLimit.length > 8)) {
+      newErrors.adFrequencyLimit = 'Максимум 8 цифр'
+    }
+    if (formData.clickLimit && (!/^\d+$/.test(formData.clickLimit) || formData.clickLimit.length > 8)) {
+      newErrors.clickLimit = 'Максимум 8 цифр'
+    }
+
+    // Validate description
+    if (formData.description && formData.description.length > 500) {
+      newErrors.description = 'Максимум 500 символов'
     }
 
     setErrors(newErrors)
@@ -228,7 +262,7 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                     onChange={(e) => handleInputChange('platform', e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                   >
-                    <option value="">{t('form.select_platform')}</option>
+
                     {platformOptions.map(option => (
                       <option key={option.value} value={option.value}>
                         {option.label}
@@ -319,19 +353,26 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                       onChange={(e) => handleInputChange('startTime', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                     >
-                      <option value="">{t('form.select_time')}</option>
-                      <option value="groups">{t('form.ad_groups')}</option>
-                      <option value="all_day">{t('form.all_day')}</option>
+                      {timeOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">{t('form.to')}</label>
-                    <input
-                      type="time"
+                    <select
                       value={formData.endTime}
                       onChange={(e) => handleInputChange('endTime', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                    />
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
+                    >
+                      {timeOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -356,7 +397,7 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                       onChange={(e) => handleInputChange('userFrequencyPeriod', e.target.value)}
                       className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                     >
-                      <option value="">{t('form.period')}</option>
+
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -384,7 +425,7 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                       onChange={(e) => handleInputChange('adFrequencyPeriod', e.target.value)}
                       className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                     >
-                      <option value="">{t('form.period')}</option>
+
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -412,7 +453,7 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                       onChange={(e) => handleInputChange('clickPeriod', e.target.value)}
                       className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                     >
-                      <option value="">{t('form.period')}</option>
+
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}

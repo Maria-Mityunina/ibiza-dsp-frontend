@@ -54,7 +54,7 @@ const EditCreativePage: React.FC = () => {
   const onSubmit = async (data: EditCreativeFormData) => {
     try {
       setIsLoading(true)
-      console.log('Updating creative:', id, data, selectedImage)
+      // Update creative implementation
       await new Promise(resolve => setTimeout(resolve, 1000))
       notify.success('Изменения сохранены', 'Креатив успешно обновлен')
       navigate(`/advertisers/${advertiserId}/campaigns/${campaignId}/adgroups/${adgroupId}/creatives`)

@@ -263,10 +263,17 @@ const translations = {
     'form.os_language': 'OS Language',
     'form.os_version': 'OS Version',
     'form.interests': 'Interests',
+    'form.show_dates': 'Campaign Period',
+    'form.show_time': 'Show Time',
+    'form.exclude_segments': 'Exclude Audience',
+    'form.exclude_regions': 'Exclude Regions',
+    'form.ad_groups': 'Ad Groups',
+    'form.all_day': 'All Day',
     
     // Creative form
     'form.placement': 'Placement',
     'form.creative_name': 'Creative Name',
+    'form.creative_budget': 'Creative Budget',
     'form.creative_title': 'Creative Title',
     'form.creative_text': 'Creative Text',
     'form.enter_title': 'Enter title',
@@ -310,9 +317,17 @@ const translations = {
     'campaign.copied_successfully': 'Campaign copied successfully',
     'advertiser.copied_successfully': 'Advertiser copied successfully',
     'advertiser.created_successfully': 'Advertiser created successfully',
+    'advertiser.updated_successfully': 'Advertiser updated successfully',
+    'advertiser.deleted_successfully': 'Advertiser deleted successfully',
     'campaign.created_successfully': 'Campaign created successfully',
+    'campaign.updated_successfully': 'Campaign updated successfully', 
+    'campaign.deleted_successfully': 'Campaign deleted successfully',
     'adgroup.created_successfully': 'Ad group created successfully',
+    'adgroup.updated_successfully': 'Ad group updated successfully',
+    'adgroup.deleted_successfully': 'Ad group deleted successfully',
     'creative.created_successfully': 'Creative created successfully',
+    'creative.updated_successfully': 'Creative updated successfully',
+    'creative.deleted_successfully': 'Creative deleted successfully',
     
     // Validation
     'form.required_field': 'This field is required',
@@ -332,8 +347,12 @@ const translations = {
     'form.enter_creative_text': 'Kilograms of money just like that...',
     'form.period': 'Period',
     'form.creative_notice': 'Please note that all created ads will be reviewed by moderation.',
-    'form.note_token': 'Note: Token generation',
-    'form.token_generation_info': 'Tokens will be automatically generated in the link.',
+    'form.note_creative': 'Creative Guidelines',
+    'form.creative_requirements': 'All creative materials will be reviewed according to our quality standards.',
+    'form.small_format_desc': 'Small format for compact placement',
+    'form.big_format_desc': 'Large format for maximum visibility',
+    'form.ad_groups': 'Ad Groups',
+    'form.all_day': 'All Day',
     'action.exit': 'Exit',
     
     // Time periods
@@ -554,7 +573,7 @@ const translations = {
     
     // Status
     'status.active': 'Активна',
-    'status.paused': 'Приостановлена',
+    'status.paused': 'Пауза',
     'status.completed': 'Завершена',
     'status.draft': 'Черновик',
     
@@ -587,14 +606,14 @@ const translations = {
     'form.update': 'Обновить',
     
     // Campaign form
-    'form.campaign_name': 'Название РК',
+    'form.campaign_name': 'Название кампании',
     'form.enter_campaign_name': 'Введите название кампании',
-    'form.campaign_period': 'Интервал проведения РК',
+    'form.campaign_period': 'Период проведения кампании',
     'form.from': 'с',
     'form.to': 'до',
     'form.platform': 'Площадка размещения',
     'form.select_platform': 'Выберите площадку',
-    'form.user_frequency_limit': 'Частота показов на пользователя',
+    'form.user_frequency_limit': 'Лимит показов на пользователя',
     'form.ad_frequency_limit': 'Лимит показов объявления',
     'form.click_limit': 'Лимит переходов',
     'form.shows': 'Показ',
@@ -614,10 +633,17 @@ const translations = {
     'form.os_language': 'Язык ОС',
     'form.os_version': 'Версия ОС',
     'form.interests': 'Интересы',
+    'form.show_dates': 'Интервал проведения РК',
+    'form.show_time': 'Время показа',
+    'form.exclude_segments': 'Исключить аудиторию',
+    'form.exclude_regions': 'Исключить регионы',
+    'form.ad_groups': 'Группы объявлений',
+    'form.all_day': 'Весь день',
     
     // Creative form
     'form.placement': 'Плейсмент',
     'form.creative_name': 'Название креатива',
+    'form.creative_budget': 'Бюджет креатива',
     'form.creative_title': 'Введите заголовок креатива',
     'form.creative_text': 'Введите текст креатива',
     'form.enter_title': 'Где лучше тусовать...',
@@ -661,9 +687,17 @@ const translations = {
     'campaign.copied_successfully': 'Кампания скопирована успешно',
     'advertiser.copied_successfully': 'Рекламодатель скопирован успешно',
     'advertiser.created_successfully': 'Рекламодатель создан успешно',
+    'advertiser.updated_successfully': 'Рекламодатель обновлен успешно',
+    'advertiser.deleted_successfully': 'Рекламодатель удален успешно',
     'campaign.created_successfully': 'Кампания создана успешно',
+    'campaign.updated_successfully': 'Кампания обновлена успешно',
+    'campaign.deleted_successfully': 'Кампания удалена успешно',
     'adgroup.created_successfully': 'Группа объявлений создана успешно',
+    'adgroup.updated_successfully': 'Группа объявлений обновлена успешно',
+    'adgroup.deleted_successfully': 'Группа объявлений удалена успешно',
     'creative.created_successfully': 'Креатив создан успешно',
+    'creative.updated_successfully': 'Креатив обновлен успешно',
+    'creative.deleted_successfully': 'Креатив удален успешно',
     
     // Validation
     'form.required_field': 'Это поле обязательно',
@@ -683,8 +717,12 @@ const translations = {
     'form.enter_creative_text': 'Килограммы денег просто так...',
     'form.period': 'Период',
     'form.creative_notice': 'Обратите внимание, что все созданные объявления будут рассмотрены модерацией.',
-    'form.note_token': 'Примечание: Генерация токенов',
-    'form.token_generation_info': 'Токены будут автоматически сгенерированы в ссылке.',
+    'form.note_creative': 'Рекомендации по креативам',
+    'form.creative_requirements': 'Все креативные материалы будут проверены в соответствии с нашими стандартами качества.',
+    'form.small_format_desc': 'Малый формат для компактного размещения',
+    'form.big_format_desc': 'Большой формат для максимальной видимости',
+    'form.ad_groups': 'Группы объявлений',
+    'form.all_day': 'Весь день',
     'action.exit': 'Выход',
     
     // Time periods
@@ -694,7 +732,7 @@ const translations = {
     'time.whole_campaign': 'Вся кампания',
     
     // Additional statuses
-    'status.pending': 'В ожидании',
+    'status.pending': 'На модерации',
     'status.rejected': 'Отклонена',
     
     // Additional UI elements

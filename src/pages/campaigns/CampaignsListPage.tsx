@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Plus, Edit, Trash2, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
-import { CreateCampaignForm } from '@components/forms'
+import { CreateCampaignForm, EditCampaignForm } from '@components/forms'
 
 interface Campaign {
   id: string
@@ -22,8 +23,12 @@ interface Campaign {
 const CampaignsListPage: React.FC = () => {
   const { t } = useLanguageStore()
   const { success } = useToast()
+  const navigate = useNavigate()
+  const { advertiserId } = useParams()
   
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null)
   const [campaigns, setCampaigns] = useState<Campaign[]>([
     {
       id: '1',
@@ -82,6 +87,37 @@ const CampaignsListPage: React.FC = () => {
     }
     
     setCampaigns(prev => [newCampaign, ...prev])
+  }
+
+  const handleDeleteCampaign = (campaignId: string) => {
+    if (window.confirm('Вы уверены, что хотите удалить эту кампанию?')) {
+      setCampaigns(prev => prev.filter(campaign => campaign.id !== campaignId))
+    }
+  }
+
+  const handleEditCampaign = (data: any) => {
+    if (!selectedCampaign) return
+    
+    const updatedCampaign: Campaign = {
+      ...selectedCampaign,
+      name: data.name,
+      status: data.status,
+      budget: parseInt(data.budget) || selectedCampaign.budget,
+      startDate: data.startDate,
+      endDate: data.endDate
+    }
+    
+    setCampaigns(prev => prev.map(campaign => 
+      campaign.id === selectedCampaign.id ? updatedCampaign : campaign
+    ))
+    success('Кампания успешно обновлена')
+    setSelectedCampaign(null)
+    setShowEditForm(false)
+  }
+
+  const openEditForm = (campaign: Campaign) => {
+    setSelectedCampaign(campaign)
+    setShowEditForm(true)
   }
 
   const toggleCampaignStatus = (id: string) => {
@@ -296,11 +332,25 @@ const CampaignsListPage: React.FC = () => {
                     </button>
                     
                     <button
-                      onClick={() => {/* Handle edit */}}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openEditForm(campaign)
+                      }}
                       className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                       title={t('action.edit')}
                     >
                       <Edit className="w-4 h-4" />
+                    </button>
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteCampaign(campaign.id)
+                      }}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Удалить"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                     
                     <button
@@ -327,6 +377,17 @@ const CampaignsListPage: React.FC = () => {
         isOpen={showCreateForm}
         onClose={() => setShowCreateForm(false)}
         onSubmit={handleCreateCampaign}
+      />
+
+      {/* Edit Campaign Form */}
+      <EditCampaignForm
+        isOpen={showEditForm}
+        onClose={() => {
+          setShowEditForm(false)
+          setSelectedCampaign(null)
+        }}
+        onSubmit={handleEditCampaign}
+        campaign={selectedCampaign}
       />
     </motion.div>
   )

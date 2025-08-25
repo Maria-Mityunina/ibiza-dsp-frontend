@@ -92,7 +92,7 @@ const EditAdvertiserPage: React.FC = () => {
       setIsLoading(true)
       
       // TODO: Заменить на реальный API вызов
-      console.log('Updating advertiser:', id, data)
+      // Update advertiser implementation
       
       // Имитация API вызова
       await new Promise(resolve => setTimeout(resolve, 1000))

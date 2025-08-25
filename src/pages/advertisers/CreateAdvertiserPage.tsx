@@ -73,7 +73,7 @@ const CreateAdvertiserPage: React.FC = () => {
       setIsLoading(true)
       
       // TODO: Заменить на реальный API вызов
-      console.log('Creating advertiser:', data)
+      // Create advertiser implementation
       
       // Имитация API вызова
       await new Promise(resolve => setTimeout(resolve, 1000))

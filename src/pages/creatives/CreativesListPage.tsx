@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer, Image as ImageIcon } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { Plus, Edit, Trash2, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer, Image as ImageIcon } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
-import { CreateCreativeForm } from '@components/forms'
+import { CreateCreativeForm, EditCreativeForm } from '@components/forms'
 
 interface Creative {
   id: string
@@ -24,8 +25,12 @@ interface Creative {
 const CreativesListPage: React.FC = () => {
   const { t } = useLanguageStore()
   const { success } = useToast()
+  const navigate = useNavigate()
+  const { advertiserId, campaignId, adGroupId } = useParams()
   
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [selectedCreative, setSelectedCreative] = useState<Creative | null>(null)
   const [creatives, setCreatives] = useState<Creative[]>([
     {
       id: '1',
@@ -106,6 +111,37 @@ const CreativesListPage: React.FC = () => {
     }
     
     setCreatives(prev => [newCreative, ...prev])
+  }
+
+  const handleDeleteCreative = (creativeId: string) => {
+    if (window.confirm('Вы уверены, что хотите удалить этот креатив?')) {
+      setCreatives(prev => prev.filter(creative => creative.id !== creativeId))
+    }
+  }
+
+  const handleEditCreative = (data: any) => {
+    if (!selectedCreative) return
+    
+    const updatedCreative: Creative = {
+      ...selectedCreative,
+      name: data.name || selectedCreative.name,
+      title: data.title,
+      text: data.text,
+      link: data.link,
+      cpm: parseFloat(data.cpm) || selectedCreative.cpm
+    }
+    
+    setCreatives(prev => prev.map(creative => 
+      creative.id === selectedCreative.id ? updatedCreative : creative
+    ))
+    success('Креатив успешно обновлен')
+    setSelectedCreative(null)
+    setShowEditForm(false)
+  }
+
+  const openEditForm = (creative: Creative) => {
+    setSelectedCreative(creative)
+    setShowEditForm(true)
   }
 
   const toggleCreativeStatus = (id: string) => {
@@ -331,11 +367,25 @@ const CreativesListPage: React.FC = () => {
                     </button>
                     
                     <button
-                      onClick={() => {/* Handle edit */}}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        openEditForm(creative)
+                      }}
                       className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                       title={t('action.edit')}
                     >
                       <Edit className="w-4 h-4" />
+                    </button>
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteCreative(creative.id)
+                      }}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Удалить"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </button>
                     
                     <button
@@ -362,6 +412,17 @@ const CreativesListPage: React.FC = () => {
         isOpen={showCreateForm}
         onClose={() => setShowCreateForm(false)}
         onSubmit={handleCreateCreative}
+      />
+
+      {/* Edit Creative Form */}
+      <EditCreativeForm
+        isOpen={showEditForm}
+        onClose={() => {
+          setShowEditForm(false)
+          setSelectedCreative(null)
+        }}
+        onSubmit={handleEditCreative}
+        creative={selectedCreative}
       />
     </motion.div>
   )

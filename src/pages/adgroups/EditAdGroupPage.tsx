@@ -41,7 +41,7 @@ const EditAdGroupPage: React.FC = () => {
   const onSubmit = async (data: EditAdGroupFormData) => {
     try {
       setIsLoading(true)
-      console.log('Updating ad group:', id, data)
+      // Update ad group implementation
       await new Promise(resolve => setTimeout(resolve, 1000))
       notify.success('Изменения сохранены', 'Группа объявлений успешно обновлена')
       navigate(`/advertisers/${advertiserId}/campaigns/${campaignId}/adgroups`)

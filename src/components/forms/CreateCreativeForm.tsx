@@ -14,6 +14,8 @@ interface CreateCreativeFormProps {
 
 interface CreativeFormData {
   placement: string
+  name: string
+  budget: string
   title: string
   text: string
   link: string
@@ -34,7 +36,9 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null)
   
   const [formData, setFormData] = useState<CreativeFormData>({
-    placement: '',
+    placement: '6_small',
+    name: '',
+    budget: '',
     title: '',
     text: '',
     link: '',
@@ -48,55 +52,55 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
   const placementOptions = [
     { 
       value: '6_small', 
-      label: '6 Маленький',
+      label: 'Маленький баннер 320x50',
       type: 'small',
       description: t('form.small_format_desc')
     },
     { 
       value: '16_small', 
-      label: '16 Маленький',
+      label: 'Компактный 300x100',
       type: 'small',
       description: t('form.small_format_desc')
     },
     { 
       value: '2_small', 
-      label: '2 Маленький',
+      label: 'Узкий баннер 728x90',
       type: 'small',
       description: t('form.small_format_desc')
     },
     { 
       value: '4_big', 
-      label: '4 Большой',
+      label: 'Большой баннер 1200x675',
       type: 'big',
       description: t('form.big_format_desc')
     },
     { 
       value: '13_small', 
-      label: '13 Маленький',
+      label: 'Квадратный 250x250',
       type: 'small',
       description: t('form.small_format_desc')
     },
     { 
       value: '10_big', 
-      label: '10 Большой',
+      label: 'Широкий баннер 1080x608',
       type: 'big',
       description: t('form.big_format_desc')
     },
     { 
       value: '3_small', 
-      label: '3 Маленький',
+      label: 'Мобильный 300x50',
       type: 'small',
       description: t('form.small_format_desc')
     },
     { 
       value: '15_small', 
-      label: '15 Маленький',
+      label: 'Средний 468x60',
       type: 'small',
       description: t('form.small_format_desc')
     },
     { 
       value: '97_small', 
-      label: '97 Маленький',
+      label: 'Вертикальный 160x600',
       type: 'small',
       description: t('form.small_format_desc')
     }
@@ -110,14 +114,27 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
     const newErrors: Record<string, string> = {}
 
     if (!formData.placement) newErrors.placement = t('form.required_field')
+    
+    if (!formData.name.trim()) newErrors.name = 'Поле обязательно для заполнения'
+    else if (formData.name.length > 64) newErrors.name = 'Максимум 64 символа'
+    
+    if (!formData.budget.trim()) newErrors.budget = 'Поле обязательно для заполнения'
+    else if (!/^\d+$/.test(formData.budget)) newErrors.budget = 'Только цифры'
+    else if (formData.budget.length > 7) newErrors.budget = 'Максимум 7 цифр'
+    
     if (!formData.link.trim()) newErrors.link = t('form.required_field')
+    else if (formData.link.length > 500) newErrors.link = 'Максимум 500 символов'
+    
     if (!formData.cpm.trim()) newErrors.cpm = t('form.required_field')
+    else if (!/^\d+$/.test(formData.cpm)) newErrors.cpm = 'Только цифры'
+    else if (formData.cpm.length > 4) newErrors.cpm = 'Максимум 4 цифры'
     
     if (isSmallFormat) {
       if (!formData.title.trim()) newErrors.title = t('form.required_field')
+      else if (formData.title.length > 16) newErrors.title = 'Максимум 16 символов'
+      
       if (!formData.text.trim()) newErrors.text = t('form.required_field')
-      if (formData.title.length > 16) newErrors.title = t('form.max_16_chars')
-      if (formData.text.length > 32) newErrors.text = t('form.max_32_chars')
+      else if (formData.text.length > 32) newErrors.text = 'Максимум 32 символа'
     }
     
     if (isBigFormat && !formData.image) {
@@ -143,7 +160,9 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
 
   const resetForm = () => {
     setFormData({
-      placement: '',
+      placement: '6_small',
+      name: '',
+      budget: '',
       title: '',
       text: '',
       link: '',
@@ -248,8 +267,8 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
           {/* Side notes */}
           <div className="hidden lg:block w-48 bg-blue-50 p-4 text-sm">
             <div className="bg-blue-100 p-3 rounded-lg mb-4">
-              <p className="text-blue-700 font-medium">{t('form.note_token')}</p>
-              <p className="text-blue-600 text-xs mt-1">{t('form.token_generation_info')}</p>
+              <p className="text-blue-700 font-medium">{t('form.note_creative')}</p>
+              <p className="text-blue-600 text-xs mt-1">{t('form.creative_requirements')}</p>
             </div>
           </div>
 
@@ -260,7 +279,7 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
               {/* Плейсмент */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('form.placement')} *
+                  Плейсмент *
                 </label>
                 <div className="relative">
                   <select
@@ -270,7 +289,7 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
                       errors.placement ? 'border-red-500' : 'border-gray-300'
                     }`}
                   >
-                    <option value="">{t('form.select_placement')}</option>
+
                     {placementOptions.map(option => (
                       <option key={option.value} value={option.value}>
                         {option.label}
@@ -280,6 +299,42 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
                   <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                 </div>
                 {errors.placement && <p className="text-red-500 text-sm mt-1">{errors.placement}</p>}
+              </div>
+
+              {/* Название креатива */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Название креатива *
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
+                    errors.name ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Введите название креатива"
+                  maxLength={64}
+                />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+              </div>
+
+              {/* Бюджет */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Бюджет *
+                </label>
+                <input
+                  type="text"
+                  value={formData.budget}
+                  onChange={(e) => handleInputChange('budget', e.target.value.replace(/\D/g, '').slice(0, 7))}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
+                    errors.budget ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="10000"
+                  maxLength={7}
+                />
+                {errors.budget && <p className="text-red-500 text-sm mt-1">{errors.budget}</p>}
               </div>
 
               {/* Dynamic fields based on placement type */}

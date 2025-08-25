@@ -37,7 +37,7 @@ const CreateCreativePage: React.FC = () => {
   const onSubmit = async (data: CreateCreativeFormData) => {
     try {
       setIsLoading(true)
-      console.log('Creating creative:', data, selectedImage)
+      // Create creative implementation
       await new Promise(resolve => setTimeout(resolve, 1000))
       notify.success('Креатив создан', 'Креатив успешно добавлен')
       navigate(`/advertisers/${advertiserId}/campaigns/${campaignId}/adgroups/${adgroupId}/creatives`)

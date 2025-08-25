@@ -43,23 +43,21 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({
     budget: '',
     startDate: '',
     endDate: '',
-    platform: '',
-    status: '',
+    platform: 'rustore',
+    status: 'draft',
     userFrequencyLimit: '',
-    userFrequencyPeriod: '',
+    userFrequencyPeriod: 'day',
     adFrequencyLimit: '',
-    adFrequencyPeriod: '',
+    adFrequencyPeriod: 'day',
     clickLimit: '',
-    clickPeriod: '',
+    clickPeriod: 'day',
     description: ''
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const platformOptions = [
-    { value: 'rustore', label: 'RuStore' },
-    { value: 'yandex', label: 'Yandex Ads' },
-    { value: 'vk', label: 'VK Ads' }
+    { value: 'rustore', label: 'RuStore' }
   ]
 
   const statusOptions = [
@@ -82,7 +80,12 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({
     const newErrors: Record<string, string> = {}
 
     if (!formData.name.trim()) newErrors.name = t('form.required_field')
+    else if (formData.name.length > 64) newErrors.name = 'Максимум 64 символа'
+    
     if (!formData.budget.trim()) newErrors.budget = t('form.required_field')
+    else if (!/^\d+$/.test(formData.budget)) newErrors.budget = 'Только цифры'
+    else if (formData.budget.length > 7) newErrors.budget = 'Максимум 7 цифр'
+    
     if (!formData.startDate.trim()) newErrors.startDate = t('form.required_field')
     if (!formData.endDate.trim()) newErrors.endDate = t('form.required_field')
     
@@ -91,6 +94,22 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({
       if (new Date(formData.startDate) >= new Date(formData.endDate)) {
         newErrors.endDate = t('form.invalid_date_range')
       }
+    }
+
+    // Validate frequency limits
+    if (formData.userFrequencyLimit && (!/^\d+$/.test(formData.userFrequencyLimit) || formData.userFrequencyLimit.length > 8)) {
+      newErrors.userFrequencyLimit = 'Максимум 8 цифр'
+    }
+    if (formData.adFrequencyLimit && (!/^\d+$/.test(formData.adFrequencyLimit) || formData.adFrequencyLimit.length > 8)) {
+      newErrors.adFrequencyLimit = 'Максимум 8 цифр'
+    }
+    if (formData.clickLimit && (!/^\d+$/.test(formData.clickLimit) || formData.clickLimit.length > 8)) {
+      newErrors.clickLimit = 'Максимум 8 цифр'
+    }
+
+    // Validate description
+    if (formData.description && formData.description.length > 500) {
+      newErrors.description = 'Максимум 500 символов'
     }
 
     setErrors(newErrors)
@@ -235,7 +254,7 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({
                   onChange={(e) => handleInputChange('platform', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                 >
-                  <option value="">{t('form.select_platform')}</option>
+
                   {platformOptions.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -257,7 +276,7 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({
                   onChange={(e) => handleInputChange('status', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                 >
-                  <option value="">{t('form.select_status')}</option>
+
                   {statusOptions.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -293,7 +312,7 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({
                       onChange={(e) => handleInputChange('userFrequencyPeriod', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                     >
-                      <option value="">{t('form.select_period')}</option>
+
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -331,7 +350,7 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({
                       onChange={(e) => handleInputChange('adFrequencyPeriod', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                     >
-                      <option value="">{t('form.select_period')}</option>
+
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -369,7 +388,7 @@ const CreateCampaignForm: React.FC<CreateCampaignFormProps> = ({
                       onChange={(e) => handleInputChange('clickPeriod', e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
                     >
-                      <option value="">{t('form.select_period')}</option>
+
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}

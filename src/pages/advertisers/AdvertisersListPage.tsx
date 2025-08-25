@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Edit, TrendingUp, DollarSign, Eye, Users } from 'lucide-react'
+import { Plus, Edit, Trash2, TrendingUp, DollarSign, Eye, Users } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
-import { CreateAdvertiserForm } from '@components/forms'
+import { CreateAdvertiserForm, EditAdvertiserForm } from '@components/forms'
 
 interface Advertiser {
   id: string
@@ -14,12 +14,23 @@ interface Advertiser {
   ctr: number
   campaigns: number
   status: 'active' | 'inactive' | 'pending'
+  inn?: string
+  kpp?: string
+  ogrn?: string
+  legalAddress?: string
+  bik?: string
+  account?: string
+  contractNumber?: string
+  contractDate?: string
+  useAutoMarking?: boolean
 }
 
 const AdvertisersListPage: React.FC = () => {
   const { t } = useLanguageStore()
   const { success } = useToast()
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [selectedAdvertiser, setSelectedAdvertiser] = useState<Advertiser | null>(null)
   const [advertisers, setAdvertisers] = useState<Advertiser[]>([
     {
       id: '1',
@@ -62,11 +73,58 @@ const AdvertisersListPage: React.FC = () => {
       spent: 0,
       ctr: 0,
       campaigns: 0,
-      status: 'pending'
+      status: 'pending',
+      inn: data.inn,
+      kpp: data.kpp,
+      ogrn: data.ogrn,
+      legalAddress: data.legalAddress,
+      bik: data.bik,
+      account: data.account,
+      contractNumber: data.contractNumber,
+      contractDate: data.contractDate,
+      useAutoMarking: data.useAutoMarking
     }
     
     setAdvertisers(prev => [newAdvertiser, ...prev])
     success(t('advertiser.created_successfully'))
+  }
+
+  const handleEditAdvertiser = (data: any) => {
+    if (!selectedAdvertiser) return
+    
+    const updatedAdvertiser: Advertiser = {
+      ...selectedAdvertiser,
+      name: data.name,
+      legalName: data.legalName,
+      inn: data.inn,
+      kpp: data.kpp,
+      ogrn: data.ogrn,
+      legalAddress: data.legalAddress,
+      bik: data.bik,
+      account: data.account,
+      contractNumber: data.contractNumber,
+      contractDate: data.contractDate,
+      useAutoMarking: data.useAutoMarking
+    }
+    
+    setAdvertisers(prev => prev.map(adv => 
+      adv.id === selectedAdvertiser.id ? updatedAdvertiser : adv
+    ))
+    success('Рекламодатель успешно обновлен')
+    setSelectedAdvertiser(null)
+    setShowEditForm(false)
+  }
+
+  const handleDeleteAdvertiser = (advertiserId: string) => {
+    if (window.confirm('Вы уверены, что хотите удалить этого рекламодателя?')) {
+      setAdvertisers(prev => prev.filter(adv => adv.id !== advertiserId))
+      success('Рекламодатель успешно удален')
+    }
+  }
+
+  const openEditForm = (advertiser: Advertiser) => {
+    setSelectedAdvertiser(advertiser)
+    setShowEditForm(true)
   }
 
   const getStatusColor = (status: string) => {
@@ -213,11 +271,22 @@ const AdvertisersListPage: React.FC = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      // Handle edit
+                      openEditForm(advertiser)
                     }}
                     className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Редактировать"
                   >
                     <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteAdvertiser(advertiser.id)
+                    }}
+                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Удалить"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -231,6 +300,17 @@ const AdvertisersListPage: React.FC = () => {
         isOpen={showCreateForm}
         onClose={() => setShowCreateForm(false)}
         onSubmit={handleCreateAdvertiser}
+      />
+
+      {/* Edit Advertiser Form */}
+      <EditAdvertiserForm
+        isOpen={showEditForm}
+        onClose={() => {
+          setShowEditForm(false)
+          setSelectedAdvertiser(null)
+        }}
+        onSubmit={handleEditAdvertiser}
+        advertiser={selectedAdvertiser}
       />
     </div>
   )
