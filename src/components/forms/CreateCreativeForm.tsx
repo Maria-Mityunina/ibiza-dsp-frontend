@@ -222,28 +222,15 @@ const CreateCreativeForm: React.FC<CreateCreativeFormProps> = ({
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
       >
-        {/* Header with advertiser info */}
-        <div className="border-b border-gray-200">
-          <div className="flex items-center justify-between p-4 bg-gray-50">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{advertiserName}</span>
-              <span className="text-sm font-medium text-green-600">{advertiserBudget}</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">{t('nav.creatives')}</span>
-              <span className="text-sm text-gray-600">{t('nav.statistics')}</span>
-              <span className="text-sm text-gray-600">{t('action.exit')}</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between p-6">
-            <h2 className="text-2xl font-bold text-gray-900">{t('creative.create_new')}</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+        {/* Simple Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">{t('creative.create_new')}</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Important Notice */}

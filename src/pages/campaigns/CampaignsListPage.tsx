@@ -127,89 +127,108 @@ const CampaignsListPage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <motion.div 
+      className="max-w-full overflow-x-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('nav.campaigns')}</h1>
-          <p className="text-gray-600 mt-1">{t('campaign.manage_campaigns')}</p>
+          <h1 className="text-2xl lg:text-3xl font-light text-black mb-2">
+            {t('nav.campaigns')}
+          </h1>
+          <p className="text-gray-600 font-light">
+            {t('campaign.manage_campaigns')}
+          </p>
         </div>
         
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+        <button
           onClick={() => setShowCreateForm(true)}
-          className="flex items-center space-x-2 px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
+          className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-medium"
         >
-          <Plus className="w-5 h-5" />
-          <span>{t('campaign.create_new')}</span>
-        </motion.button>
+          <Plus className="h-4 w-4" />
+          {t('campaign.create_new')}
+        </button>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Eye className="w-5 h-5 text-blue-600" />
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <motion.div 
+          className="bg-blue-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <Eye className="h-5 w-5 text-blue-600" />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.impressions')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {campaigns.reduce((sum, camp) => sum + camp.impressions, 0).toLocaleString()}
-              </p>
-            </div>
+            <span className="text-sm text-gray-600">{t('metric.impressions')}</span>
           </div>
-        </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {campaigns.reduce((sum, camp) => sum + camp.impressions, 0).toLocaleString()}
+          </div>
+        </motion.div>
         
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <MousePointer className="w-5 h-5 text-green-600" />
+        <motion.div 
+          className="bg-green-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-green-100 rounded-xl">
+              <MousePointer className="h-5 w-5 text-green-600" />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.clicks')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {campaigns.reduce((sum, camp) => sum + camp.clicks, 0).toLocaleString()}
-              </p>
-            </div>
+            <span className="text-sm text-gray-600">{t('metric.clicks')}</span>
           </div>
-        </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {campaigns.reduce((sum, camp) => sum + camp.clicks, 0).toLocaleString()}
+          </div>
+        </motion.div>
         
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
+        <motion.div 
+          className="bg-purple-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-purple-100 rounded-xl">
+              <TrendingUp className="h-5 w-5 text-purple-600" />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.ctr')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {(campaigns.reduce((sum, camp) => sum + camp.ctr, 0) / campaigns.length).toFixed(1)}%
-              </p>
-            </div>
+            <span className="text-sm text-gray-600">{t('metric.ctr')}</span>
           </div>
-        </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {(campaigns.reduce((sum, camp) => sum + camp.ctr, 0) / campaigns.length).toFixed(1)}%
+          </div>
+        </motion.div>
         
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-orange-600" />
+        <motion.div 
+          className="bg-orange-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-orange-100 rounded-xl">
+              <DollarSign className="h-5 w-5 text-orange-600" />
             </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.spend')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                ${campaigns.reduce((sum, camp) => sum + camp.spent, 0).toLocaleString()}
-              </p>
-            </div>
+            <span className="text-sm text-gray-600">{t('metric.spend')}</span>
           </div>
-        </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            ${campaigns.reduce((sum, camp) => sum + camp.spent, 0).toLocaleString()}
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Campaigns List Header */}
+      <div className="mb-6">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">
+          {t('campaign.all_campaigns')}
+        </h2>
       </div>
 
       {/* Campaigns List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">{t('campaign.all_campaigns')}</h2>
-        </div>
+      <div className="space-y-4">
         
         <div className="divide-y divide-gray-200">
           {campaigns.map((campaign) => {
@@ -309,7 +328,7 @@ const CampaignsListPage: React.FC = () => {
         onClose={() => setShowCreateForm(false)}
         onSubmit={handleCreateCampaign}
       />
-    </div>
+    </motion.div>
   )
 }
 

@@ -344,7 +344,23 @@ const translations = {
     
     // Additional statuses
     'status.pending': 'Pending',
-    'status.rejected': 'Rejected'
+    'status.rejected': 'Rejected',
+    
+    // Additional UI elements
+    'nav.statistics': 'Statistics',
+    'ui.all_formats': 'All formats',
+    'ui.upload_creative': 'Upload Creative',
+    'ui.grid_view': 'Grid View',
+    'ui.chart_view': 'Chart View',
+    'ui.toggle_view': 'Toggle between grid and chart view',
+    'ui.filter': 'Filter',
+    'ui.apply_filter': 'Apply filters to results',
+    'ui.search': 'Search',
+    'ui.export': 'Export data',
+    'ui.refresh': 'Refresh data',
+    'ui.view_all': 'View All',
+    'ui.show_more': 'Show More',
+    'ui.show_less': 'Show Less'
   },
   ru: {
     // Navigation
@@ -679,7 +695,23 @@ const translations = {
     
     // Additional statuses
     'status.pending': 'В ожидании',
-    'status.rejected': 'Отклонена'
+    'status.rejected': 'Отклонена',
+    
+    // Additional UI elements
+    'nav.statistics': 'Статистика',
+    'ui.all_formats': 'Все форматы',
+    'ui.upload_creative': 'Загрузить креатив',
+    'ui.grid_view': 'Сетка',
+    'ui.chart_view': 'График',
+    'ui.toggle_view': 'Переключить между сеткой и графиком',
+    'ui.filter': 'Фильтр',
+    'ui.apply_filter': 'Применить фильтры к результатам',
+    'ui.search': 'Поиск',
+    'ui.export': 'Экспорт данных',
+    'ui.refresh': 'Обновить данные',
+    'ui.view_all': 'Показать все',
+    'ui.show_more': 'Показать больше',
+    'ui.show_less': 'Показать меньше'
   }
 }
 

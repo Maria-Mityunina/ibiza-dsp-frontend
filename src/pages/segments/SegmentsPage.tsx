@@ -1,6 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Upload, Edit2, Trash2 } from 'lucide-react'
+import { Upload, Edit2, Trash2, Plus } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useLanguageStore } from '@stores/languageStore'
 import { useAuthStore } from '@stores/authStore'
 import { GlassCard } from '@components/ui'
 import clsx from 'clsx'
@@ -34,6 +36,7 @@ const mockSegments = [
 ]
 
 const SegmentsPage: React.FC = () => {
+  const { t } = useLanguageStore()
   const { hasPermission } = useAuthStore()
 
   const canCreateSegment = hasPermission('create_segment')
@@ -45,9 +48,14 @@ const SegmentsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 py-6">
-      {/* Header with button */}
-      <div className="flex items-start justify-between">
+    <motion.div 
+      className="max-w-full overflow-x-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div className="flex flex-col">
           <div className="flex items-center space-x-4 mb-4 mt-6">
             {canCreateSegment && (
@@ -157,7 +165,7 @@ const SegmentsPage: React.FC = () => {
           )}
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
 

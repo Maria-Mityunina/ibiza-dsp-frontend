@@ -29,6 +29,8 @@ const CreativePerformancePage: React.FC = () => {
   const { filters, updateFilter } = useFilters()
   const { exportData, isExporting } = useExport()
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
+  const [selectedFormat, setSelectedFormat] = useState<string>('all')
+  const [showFilters, setShowFilters] = useState(false)
 
   // Creative performance data
   const creativeAssets = [
@@ -123,11 +125,14 @@ const CreativePerformancePage: React.FC = () => {
         
         <div className="flex items-center space-x-4">
           <select 
-            value={filters.format}
-            onChange={(e) => updateFilter('format', e.target.value)}
+            value={selectedFormat}
+            onChange={(e) => {
+              setSelectedFormat(e.target.value)
+              updateFilter('format', e.target.value)
+            }}
             className="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm"
           >
-            <option value="all">{t('creative.all_formats')}</option>
+            <option value="all">{t('ui.all_formats')}</option>
             <option value="banner">{t('creative.banner')}</option>
             <option value="video">{t('creative.video')}</option>
             <option value="native">{t('creative.native')}</option>
@@ -137,23 +142,45 @@ const CreativePerformancePage: React.FC = () => {
           <div className="flex rounded-lg border border-slate-200 bg-white">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-2 text-sm ${viewMode === 'grid' ? 'bg-slate-900 text-white' : 'text-slate-600'}`}
+              className={`px-3 py-2 rounded-l-lg text-sm transition-colors ${
+                viewMode === 'grid' 
+                  ? 'bg-slate-900 text-white' 
+                  : 'text-slate-600 hover:bg-slate-50'
+              }`}
+              title={t('ui.grid_view')}
             >
               <Grid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`px-3 py-2 text-sm ${viewMode === 'table' ? 'bg-slate-900 text-white' : 'text-slate-600'}`}
+              className={`px-3 py-2 rounded-r-lg text-sm transition-colors ${
+                viewMode === 'table' 
+                  ? 'bg-slate-900 text-white' 
+                  : 'text-slate-600 hover:bg-slate-50'
+              }`}
+              title={t('ui.chart_view')}
             >
               <BarChart3 className="w-4 h-4" />
             </button>
           </div>
           
           <button 
+            onClick={() => setShowFilters(!showFilters)}
+            className={`px-3 py-2 rounded-lg text-sm transition-colors mr-2 ${
+              showFilters 
+                ? 'bg-slate-900 text-white' 
+                : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+            title={t('ui.apply_filter')}
+          >
+            <Filter className="w-4 h-4" />
+          </button>
+          
+          <button 
             onClick={() => console.log('Upload creative modal...')}
             className="px-3 py-2 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-800 transition-colors"
           >
-            {t('creative.upload_creative')}
+            {t('ui.upload_creative')}
           </button>
         </div>
       </motion.div>
