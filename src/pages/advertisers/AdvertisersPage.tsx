@@ -1,73 +1,63 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Edit2, Users, Copy } from 'lucide-react'
-import { useAuthStore } from '@stores/authStore'
-import { notify } from '@stores/notificationStore'
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Plus, Edit, Eye, Copy, TrendingUp, DollarSign, Users } from 'lucide-react'
+import { useLanguageStore } from '@stores/languageStore'
+import { useToast } from '@hooks/useToast'
+import { CreateAdvertiserForm } from '@components/forms'
 
-// Мок данные для демонстрации
-const mockAdvertisers = [
-  {
-    id: '1',
-    name: 'ООО "Технологии будущего"',
-    legalName: 'Общество с ограниченной ответственностью "Технологии будущего"',
-    inn: '123456789012',
-    kpp: '123456789',
-    ogrn: '123456789012345',
-    legalAddress: 'г. Москва, ул. Примерная, д. 1',
-    bik: '123456789',
-    accountNumber: '12345678901234567890',
-    contractNumber: 'Д-001/2024',
-    contractDate: '2024-01-15',
-    useAutoMarketing: true,
-    budget: 500000,
-    statistics: {
-      ctr: 2.45,
-      spent: 125000,
-      campaigns: 5,
-    },
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-20T15:30:00Z',
-  },
-  {
-    id: '2', 
-    name: 'ИП Петров А.И.',
-    legalName: 'Индивидуальный предприниматель Петров Андрей Иванович',
-    inn: '123456789013',
-    kpp: '123456790',
-    ogrn: '123456789012346',
-    legalAddress: 'г. Санкт-Петербург, ул. Невская, д. 10',
-    bik: '123456790',
-    accountNumber: '12345678901234567891',
-    contractNumber: 'Д-002/2024',
-    contractDate: '2024-02-01',
-    useAutoMarketing: false,
-    budget: 250000,
-    statistics: {
-      ctr: 1.87,
-      spent: 89500,
-      campaigns: 3,
-    },
-    createdAt: '2024-02-01T09:15:00Z',
-    updatedAt: '2024-02-05T11:45:00Z',
-  },
-]
+interface Advertiser {
+  id: string
+  name: string
+  legalName: string
+  inn: string
+  budget: number
+  spent: number
+  ctr: number
+  campaigns: number
+  status: 'active' | 'paused' | 'draft'
+  createdAt: string
+}
 
 const AdvertisersPage: React.FC = () => {
-  const { hasPermission } = useAuthStore()
-  const [searchQuery, setSearchQuery] = React.useState('')
+  const { t } = useLanguageStore()
+  const { success } = useToast()
   
-  // Фильтрация рекламодателей по поисковому запросу
-  const filteredAdvertisers = React.useMemo(() => {
-    if (!searchQuery.trim()) return mockAdvertisers
-    
-    return mockAdvertisers.filter(advertiser => 
-      advertiser.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      advertiser.legalName.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }, [searchQuery])
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [advertisers, setAdvertisers] = useState<Advertiser[]>([
+    {
+      id: '1',
+      name: 'ООО "Технологии будущего"',
+      legalName: 'Общество с ограниченной ответственностью "Технологии будущего"',
+      inn: '123456789012',
+      budget: 500000,
+      spent: 125000,
+      ctr: 2.45,
+      campaigns: 5,
+      status: 'active',
+      createdAt: '2024-01-15T10:00:00Z'
+    },
+    {
+      id: '2',
+      name: 'ИП Петров А.И.',
+      legalName: 'Индивидуальный предприниматель Петров Андрей Иванович',
+      inn: '123456789013',
+      budget: 250000,
+      spent: 89500,
+      ctr: 1.87,
+      campaigns: 3,
+      status: 'active',
+      createdAt: '2024-02-01T09:15:00Z'
+    }
+  ])
 
-  const canCreateAdvertiser = hasPermission('create_advertiser')
-  const canEditAdvertiser = hasPermission('edit_advertiser')
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'bg-emerald-100 text-emerald-700'
+      case 'paused': return 'bg-yellow-100 text-yellow-700'
+      case 'draft': return 'bg-gray-100 text-gray-700'
+      default: return 'bg-gray-100 text-gray-700'
+    }
+  }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('ru-RU', {
@@ -78,160 +68,295 @@ const AdvertisersPage: React.FC = () => {
     }).format(value)
   }
 
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(2)}%`
+  const handleCreateAdvertiser = (data: any) => {
+    const newAdvertiser: Advertiser = {
+      id: (advertisers.length + 1).toString(),
+      name: data.name,
+      legalName: data.legalName,
+      inn: data.inn,
+      budget: data.budget,
+      spent: 0,
+      ctr: 0,
+      campaigns: 0,
+      status: 'draft',
+      createdAt: new Date().toISOString()
+    }
+    
+    setAdvertisers([...advertisers, newAdvertiser])
+    setShowCreateForm(false)
+    success('Рекламодатель создан успешно!')
   }
 
+  const totalAdvertisers = advertisers.length
+  const activeAdvertisers = advertisers.filter(a => a.status === 'active').length
+  const totalBudget = advertisers.reduce((sum, a) => sum + a.budget, 0)
+  const totalSpent = advertisers.reduce((sum, a) => sum + a.spent, 0)
+
   return (
-    <div className="space-y-6">
-      {/* Action Button */}
-      <div className="flex items-start mt-6">
-        {canCreateAdvertiser && (
-          <Link
-            to="/advertisers/create"
-            className="px-4 py-2 bg-white border border-black text-black text-sm font-normal rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Добавить рекламодателя
-          </Link>
-        )}
+    <motion.div 
+      className="max-w-full overflow-x-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-light text-black mb-2">
+            {t('nav.advertisers')}
+          </h1>
+          <p className="text-gray-600 font-light">
+            {t('advertiser.manage_advertisers')}
+          </p>
+        </div>
+        
+        <button
+          onClick={() => setShowCreateForm(true)}
+          className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-medium"
+        >
+          <Plus className="h-4 w-4" />
+          {t('advertiser.create_new')}
+        </button>
       </div>
 
-      {/* Table Header - Desktop */}
-      <div className="hidden md:grid grid-cols-6 gap-4 px-4 py-2 text-sm font-medium text-gray-600 border-b border-gray-200">
-        <div className="col-span-2">Рекламодатель</div>
-        <div className="text-center">Бюджет</div>
-        <div className="text-center">CTR</div>
-        <div className="text-center">Потрачено</div>
-        <div className="text-center">Действия</div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <motion.div 
+          className="bg-blue-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-blue-100 rounded-xl">
+              <Users className="h-5 w-5 text-blue-600" />
+            </div>
+            <span className="text-sm text-gray-600">{t('metric.impressions')}</span>
+          </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {totalAdvertisers.toLocaleString()}
+          </div>
+          <div className="text-xs text-gray-500">
+            {activeAdvertisers} {t('status.active').toLowerCase()}
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-green-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-green-100 rounded-xl">
+              <DollarSign className="h-5 w-5 text-green-600" />
+            </div>
+            <span className="text-sm text-gray-600">{t('metric.budget')}</span>
+          </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {formatCurrency(totalBudget)}
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-purple-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-purple-100 rounded-xl">
+              <TrendingUp className="h-5 w-5 text-purple-600" />
+            </div>
+            <span className="text-sm text-gray-600">{t('metric.spend')}</span>
+          </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {formatCurrency(totalSpent)}
+          </div>
+        </motion.div>
+
+        <motion.div 
+          className="bg-orange-50 p-6 rounded-2xl"
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-orange-100 rounded-xl">
+              <TrendingUp className="h-5 w-5 text-orange-600" />
+            </div>
+            <span className="text-sm text-gray-600">{t('metric.ctr')}</span>
+          </div>
+          <div className="text-2xl font-semibold text-gray-900 mb-1">
+            {((totalSpent / totalBudget) * 100 || 0).toFixed(1)}%
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Advertisers List Header */}
+      <div className="mb-6">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">
+          {t('advertiser.all_advertisers')}
+        </h2>
       </div>
 
       {/* Advertisers List */}
-      <div className="space-y-3">
-        {filteredAdvertisers.map((advertiser) => (
-          <div key={advertiser.id} className="bg-white/60 backdrop-blur-sm border border-gray-200 rounded-lg hover:shadow-md transition-all">
-            {/* Desktop View */}
-            <div className="hidden md:grid grid-cols-6 gap-4 px-4 py-4 items-center">
-              {/* Advertiser name */}
-              <div className="col-span-2">
-                <Link
-                  to={`/advertisers/${advertiser.id}/campaigns`}
-                  className="text-sm font-medium text-black hover:text-gray-700 transition-colors"
-                >
-                  {advertiser.name}
-                </Link>
+      <div className="space-y-4">
+        {advertisers.map((advertiser, index) => (
+          <motion.div
+            key={advertiser.id}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+            whileHover={{ y: -2 }}
+          >
+            {/* Desktop Layout */}
+            <div className="hidden lg:flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-4 mb-2">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {advertiser.name}
+                  </h3>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(advertiser.status)}`}>
+                    {t(`status.${advertiser.status}`)}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 mb-3">
+                  {advertiser.legalName} • ИНН: {advertiser.inn}
+                </p>
+                <div className="flex items-center gap-8">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">{t('form.budget')}:</span>
+                    <span className="text-sm font-medium">{formatCurrency(advertiser.budget)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">{t('metric.spend')}:</span>
+                    <span className="text-sm font-medium">{formatCurrency(advertiser.spent)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">{t('metric.ctr')}:</span>
+                    <span className="text-sm font-medium">{advertiser.ctr}%</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">{t('metric.cpm')}:</span>
+                    <span className="text-sm font-medium">{advertiser.campaigns}</span>
+                  </div>
+                </div>
               </div>
               
-              {/* Statistics */}
-              <div className="text-center text-sm font-normal text-gray-900">
-                ${(advertiser.budget / 1000).toFixed(0)}k
-              </div>
-              <div className="text-center text-sm font-normal text-gray-900">
-                {advertiser.statistics.ctr.toFixed(1)}%
-              </div>
-              <div className="text-center text-sm font-normal text-gray-900">
-                ${(advertiser.statistics.spent / 1000).toFixed(0)}k
-              </div>
-              
-              {/* Action buttons */}
-              <div className="flex items-center justify-center space-x-2">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => {
-                    console.log('Copy advertiser:', advertiser.id)
-                    notify.success('Скопировано', 'Рекламодатель скопирован')
-                  }}
-                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Копировать"
+                  onClick={() => success('Рекламодатель скопирован')}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                  title={t('action.copy')}
                 >
                   <Copy className="h-4 w-4" />
                 </button>
-                {canEditAdvertiser && (
-                  <Link
-                    to={`/advertisers/${advertiser.id}/edit`}
-                    className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Редактировать"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Link>
-                )}
+                <button
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                  title={t('action.edit')}
+                >
+                  <Edit className="h-4 w-4" />
+                </button>
+                <button
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                  title={t('advertiser.view_campaigns')}
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
               </div>
             </div>
 
-            {/* Mobile View */}
-            <div className="md:hidden p-4">
-              <div className="flex items-center justify-between mb-3">
-                <Link
-                  to={`/advertisers/${advertiser.id}/campaigns`}
-                  className="text-sm font-medium text-black hover:text-gray-700 transition-colors"
-                >
-                  {advertiser.name}
-                </Link>
-                <div className="flex items-center space-x-2">
+            {/* Mobile Layout */}
+            <div className="lg:hidden">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex-1">
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">
+                    {advertiser.name}
+                  </h3>
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(advertiser.status)}`}>
+                    {t(`status.${advertiser.status}`)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
                   <button
-                    onClick={() => {
-                      console.log('Copy advertiser:', advertiser.id)
-                      notify.success('Скопировано', 'Рекламодатель скопирован')
-                    }}
-                    className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Копировать"
+                    onClick={() => success('Рекламодатель скопирован')}
+                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
                   >
                     <Copy className="h-4 w-4" />
                   </button>
-                  {canEditAdvertiser && (
-                    <Link
-                      to={`/advertisers/${advertiser.id}/edit`}
-                      className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-                      title="Редактировать"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Link>
-                  )}
+                  <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200">
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200">
+                    <Eye className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4 text-xs">
+              
+              <p className="text-sm text-gray-500 mb-4">
+                ИНН: {advertiser.inn}
+              </p>
+              
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-gray-600 mb-1">Бюджет</div>
-                  <div className="font-medium text-gray-900 text-xs truncate">${(advertiser.budget / 1000).toFixed(0)}k</div>
+                  <span className="text-xs text-gray-500 block">{t('form.budget')}</span>
+                  <span className="text-sm font-medium">{formatCurrency(advertiser.budget)}</span>
                 </div>
                 <div>
-                  <div className="text-gray-600 mb-1">CTR</div>
-                  <div className="font-medium text-gray-900">{advertiser.statistics.ctr.toFixed(1)}%</div>
+                  <span className="text-xs text-gray-500 block">{t('metric.spend')}</span>
+                  <span className="text-sm font-medium">{formatCurrency(advertiser.spent)}</span>
                 </div>
                 <div>
-                  <div className="text-gray-600 mb-1">Потрачено</div>
-                  <div className="font-medium text-gray-900 text-xs truncate">${(advertiser.statistics.spent / 1000).toFixed(0)}k</div>
+                  <span className="text-xs text-gray-500 block">{t('metric.ctr')}</span>
+                  <span className="text-sm font-medium">{advertiser.ctr}%</span>
+                </div>
+                <div>
+                  <span className="text-xs text-gray-500 block">Кампаний</span>
+                  <span className="text-sm font-medium">{advertiser.campaigns}</span>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       {/* Empty State */}
-      {filteredAdvertisers.length === 0 && (
-        <div className="text-center py-12">
+      {advertisers.length === 0 && (
+        <motion.div 
+          className="text-center py-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="text-gray-400 mb-4">
             <Users className="h-16 w-16 mx-auto" />
           </div>
-          <h3 className="text-lg font-normal text-gray-900 mb-2">
-            {searchQuery ? 'Рекламодатели не найдены' : 'Нет рекламодателей'}
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Нет рекламодателей
           </h3>
-          <p className="text-gray-600 mb-6 font-normal">
-            {searchQuery 
-              ? 'Попробуйте изменить параметры поиска'
-              : 'Создайте первого рекламодателя для начала работы'
-            }
+          <p className="text-gray-500 mb-6">
+            Создайте первого рекламодателя для начала работы
           </p>
-          {!searchQuery && canCreateAdvertiser && (
-            <Link
-              to="/advertisers/create"
-              className="inline-flex items-center px-4 py-2 bg-white border border-black text-black text-sm font-normal rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Добавить рекламодателя
-            </Link>
-          )}
+          <button
+            onClick={() => setShowCreateForm(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-medium"
+          >
+            <Plus className="h-4 w-4" />
+            {t('advertiser.create_new')}
+          </button>
+        </motion.div>
+      )}
+
+      {/* Create Form Modal */}
+      {showCreateForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <CreateAdvertiserForm
+              onSubmit={handleCreateAdvertiser}
+              onClose={() => setShowCreateForm(false)}
+            />
+          </div>
         </div>
       )}
-    </div>
+    </motion.div>
   )
 }
 

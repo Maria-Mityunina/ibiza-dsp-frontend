@@ -127,6 +127,7 @@ const translations = {
     'creative.native': 'Native',
     'creative.display': 'Display',
     'creative.upload_creative': 'Upload Creative',
+    'creative.create_new': 'Create Creative',
     'creative.total_creatives': 'Total Creatives',
     'creative.active': 'Active',
     'creative.avg_ctr': 'Avg CTR',
@@ -188,7 +189,162 @@ const translations = {
     'time.24h': '24h',
     'time.7d': '7d',
     'time.30d': '30d',
-    'time.90d': '90d'
+    'time.90d': '90d',
+    
+    // Metrics
+    'metric.impressions': 'Impressions',
+    'metric.clicks': 'Clicks',
+    'metric.ctr': 'CTR',
+    'metric.spend': 'Spend',
+    'metric.cpm': 'CPM',
+    'metric.budget': 'Budget',
+    'metric.conversions': 'Conversions',
+    'metric.revenue': 'Revenue',
+    
+    // Status
+    'status.active': 'Active',
+    'status.paused': 'Paused',
+    'status.completed': 'Completed',
+    'status.draft': 'Draft',
+    
+    // Campaign actions
+    'campaign.create_new': 'Create Campaign',
+    'campaign.manage_campaigns': 'Manage Campaigns',
+    'campaign.all_campaigns': 'All Campaigns',
+    'campaign.view_details': 'View Details',
+    'campaign.edit': 'Edit',
+    'campaign.copy': 'Copy',
+    'campaign.pause': 'Pause',
+    'campaign.resume': 'Resume',
+    
+    // Advertiser actions
+    'advertiser.create_new': 'Create Advertiser',
+    'advertiser.manage_advertisers': 'Manage Advertisers',
+    'advertiser.all_advertisers': 'All Advertisers',
+    'advertiser.view_campaigns': 'View Campaigns',
+    
+    // Form fields
+    'form.name': 'Name',
+    'form.budget': 'Budget',
+    'form.status': 'Status',
+    'form.start_date': 'Start Date',
+    'form.end_date': 'End Date',
+    'form.description': 'Description',
+    'form.save': 'Save',
+    'form.cancel': 'Cancel',
+    'form.create': 'Create',
+    'form.update': 'Update',
+    
+    // Campaign form
+    'form.campaign_name': 'Campaign Name',
+    'form.enter_campaign_name': 'Enter campaign name',
+    'form.campaign_period': 'Campaign Period',
+    'form.from': 'From',
+    'form.to': 'To',
+    'form.platform': 'Platform',
+    'form.select_platform': 'Select platform',
+    'form.user_frequency_limit': 'User Frequency Limit',
+    'form.ad_frequency_limit': 'Ad Frequency Limit',
+    'form.click_limit': 'Click Limit',
+    'form.shows': 'Shows',
+    
+    // Ad Group form
+    'form.placement_name': 'Placement Name',
+    'form.adgroup_name': 'Ad Group Name',
+    'form.time_range': 'Time Range',
+    'form.user_show_limit': 'User Show Limit',
+    'form.ad_show_limit': 'Ad Show Limit',
+    'form.transition_limit': 'Transition Limit',
+    'form.ready_segment': 'Ready Segment',
+    'form.upload_csv': 'Upload CSV file to load a new segment',
+    'form.exclude_audience': 'Exclude Audience',
+    'form.phone_model': 'Phone Model',
+    'form.region': 'Region',
+    'form.os_language': 'OS Language',
+    'form.os_version': 'OS Version',
+    'form.interests': 'Interests',
+    
+    // Creative form
+    'form.placement': 'Placement',
+    'form.creative_name': 'Creative Name',
+    'form.creative_title': 'Creative Title',
+    'form.creative_text': 'Creative Text',
+    'form.enter_title': 'Enter title',
+    'form.enter_text': 'Enter text',
+    'form.enter_link': 'Enter link',
+    'form.max_16_chars': 'Maximum 16 characters',
+    'form.max_32_chars': 'Maximum 32 characters',
+    'form.image': 'Image',
+    'form.upload_image': 'Upload image file for loading, no larger than 1920x1080 pixels',
+    'form.image_sizes': 'Image sizes 1200x675, 1080x608, 600x324 pixels',
+    'form.cpm': 'CPM',
+    'form.preview': 'Preview',
+    'form.launch_after_save': 'Launch after save',
+    
+    // Advertiser form
+    'form.advertiser_name': 'Advertiser Name',
+    'form.legal_name': 'Legal Name',
+    'form.inn': 'INN',
+    'form.kpp': 'KPP',
+    'form.ogrn': 'OGRN/OGRNIP',
+    'form.legal_address': 'Legal Address',
+    'form.bik': 'BIK',
+    'form.account_number': 'Account Number',
+    'form.contract_number': 'Contract Number',
+    'form.contract_date': 'Contract Date',
+    'form.use_auto_marketing': 'Use auto-marketing in ORD',
+    
+    // Actions
+    'action.edit': 'Edit',
+    'action.copy': 'Copy',
+    'action.delete': 'Delete',
+    'action.view': 'View',
+    'action.create': 'Create',
+    'action.export': 'Export',
+    'action.refresh': 'Refresh',
+    'action.duplicate': 'Duplicate',
+    'action.pause': 'Pause',
+    'action.resume': 'Resume',
+    
+    // Messages
+    'campaign.copied_successfully': 'Campaign copied successfully',
+    'advertiser.copied_successfully': 'Advertiser copied successfully',
+    'advertiser.created_successfully': 'Advertiser created successfully',
+    'campaign.created_successfully': 'Campaign created successfully',
+    'adgroup.created_successfully': 'Ad group created successfully',
+    'creative.created_successfully': 'Creative created successfully',
+    
+    // Validation
+    'form.required_field': 'This field is required',
+    'form.invalid_inn': 'INN must be 12 digits',
+    'form.invalid_kpp': 'KPP must be 9 digits',
+    'form.invalid_ogrn': 'OGRN must be 15 digits',
+    'form.invalid_bik': 'BIK must be 9 digits',
+    'form.invalid_account': 'Account number must be 20 digits',
+    'form.validation_error': 'Please fix validation errors',
+    'form.enter_advertiser_name': 'Enter advertiser name',
+    'form.enter_legal_name': 'Enter legal name',
+    'form.enter_contract_number': 'Enter contract number',
+    'form.enter_legal_address': 'Enter legal address',
+    'form.enter_description': 'Enter description',
+    'form.enter_adgroup_name': 'Enter ad group name',
+    'form.enter_creative_title': 'Where is better to hang out...',
+    'form.enter_creative_text': 'Kilograms of money just like that...',
+    'form.period': 'Period',
+    'form.creative_notice': 'Please note that all created ads will be reviewed by moderation.',
+    'form.note_token': 'Note: Token generation',
+    'form.token_generation_info': 'Tokens will be automatically generated in the link.',
+    'action.exit': 'Exit',
+    
+    // Time periods
+    'time.day': 'Day',
+    'time.week': 'Week', 
+    'time.month': 'Month',
+    'time.whole_campaign': 'Whole campaign',
+    
+    // Additional statuses
+    'status.pending': 'Pending',
+    'status.rejected': 'Rejected'
   },
   ru: {
     // Navigation
@@ -306,6 +462,7 @@ const translations = {
     'creative.native': 'Нативная',
     'creative.display': 'Дисплей',
     'creative.upload_creative': 'Загрузить креатив',
+    'creative.create_new': 'Создать креатив',
     'creative.total_creatives': 'Всего креативов',
     'creative.active': 'Активные',
     'creative.avg_ctr': 'Средний CTR',
@@ -361,13 +518,168 @@ const translations = {
     'settings.english': 'English',
     'settings.russian': 'Русский',
     
-    // Time ranges
+        // Time ranges
     'time.1h': '1ч',
     'time.6h': '6ч',
-    'time.24h': '24ч', 
+    'time.24h': '24ч',
     'time.7d': '7д',
     'time.30d': '30д',
-    'time.90d': '90д'
+    'time.90d': '90д',
+    
+    // Metrics
+    'metric.impressions': 'Показы',
+    'metric.clicks': 'Клики',
+    'metric.ctr': 'CTR',
+    'metric.spend': 'Потрачено',
+    'metric.cpm': 'CPM',
+    'metric.budget': 'Бюджет',
+    'metric.conversions': 'Конверсии',
+    'metric.revenue': 'Доход',
+    
+    // Status
+    'status.active': 'Активна',
+    'status.paused': 'Приостановлена',
+    'status.completed': 'Завершена',
+    'status.draft': 'Черновик',
+    
+    // Campaign actions
+    'campaign.create_new': 'Создать кампанию',
+    'campaign.manage_campaigns': 'Управление кампаниями',
+    'campaign.all_campaigns': 'Все кампании',
+    'campaign.view_details': 'Подробности',
+    'campaign.edit': 'Редактировать',
+    'campaign.copy': 'Копировать',
+    'campaign.pause': 'Приостановить',
+    'campaign.resume': 'Возобновить',
+    
+    // Advertiser actions
+    'advertiser.create_new': 'Создать рекламодателя',
+    'advertiser.manage_advertisers': 'Управление рекламодателями',
+    'advertiser.all_advertisers': 'Все рекламодатели',
+    'advertiser.view_campaigns': 'Посмотреть кампании',
+    
+    // Form fields
+    'form.name': 'Название',
+    'form.budget': 'Бюджет',
+    'form.status': 'Статус',
+    'form.start_date': 'Дата начала',
+    'form.end_date': 'Дата окончания',
+    'form.description': 'Описание',
+    'form.save': 'Сохранить',
+    'form.cancel': 'Отмена',
+    'form.create': 'Создать',
+    'form.update': 'Обновить',
+    
+    // Campaign form
+    'form.campaign_name': 'Название РК',
+    'form.enter_campaign_name': 'Введите название кампании',
+    'form.campaign_period': 'Интервал проведения РК',
+    'form.from': 'с',
+    'form.to': 'до',
+    'form.platform': 'Площадка размещения',
+    'form.select_platform': 'Выберите площадку',
+    'form.user_frequency_limit': 'Частота показов на пользователя',
+    'form.ad_frequency_limit': 'Лимит показов объявления',
+    'form.click_limit': 'Лимит переходов',
+    'form.shows': 'Показ',
+    
+    // Ad Group form
+    'form.placement_name': 'Площадка размещения',
+    'form.adgroup_name': 'Название группы объявлений',
+    'form.time_range': 'Время показа',
+    'form.user_show_limit': 'Лимит показов на пользователя',
+    'form.ad_show_limit': 'Лимит показов объявления',
+    'form.transition_limit': 'Лимит переходов',
+    'form.ready_segment': 'Готовый сегмент',
+    'form.upload_csv': 'Перетащите файл сюда, чтобы загрузить новый сегмент',
+    'form.exclude_audience': 'Исключить аудиторию',
+    'form.phone_model': 'Модель телефона',
+    'form.region': 'Регион',
+    'form.os_language': 'Язык ОС',
+    'form.os_version': 'Версия ОС',
+    'form.interests': 'Интересы',
+    
+    // Creative form
+    'form.placement': 'Плейсмент',
+    'form.creative_name': 'Название креатива',
+    'form.creative_title': 'Введите заголовок креатива',
+    'form.creative_text': 'Введите текст креатива',
+    'form.enter_title': 'Где лучше тусовать...',
+    'form.enter_text': 'Килограммы денег просто так в ойтаучки...',
+    'form.enter_link': 'Введите ссылку',
+    'form.max_16_chars': 'Максимум 16 символов',
+    'form.max_32_chars': 'Максимум 32 символа',
+    'form.image': 'Изображение',
+    'form.upload_image': 'Перетащите сюда изображение для загрузки или нажмите на кнопку чтобы выбрать в проводнике',
+    'form.image_sizes': 'Размеры креативов 1200x675, 1080x608, 600x324 пикселей',
+    'form.cpm': 'CPM',
+    'form.preview': 'Предпросмотр',
+    'form.launch_after_save': 'Запуск после сохранения',
+    
+    // Advertiser form
+    'form.advertiser_name': 'Наименование рекламодателя',
+    'form.legal_name': 'Наименование юр лица',
+    'form.inn': 'ИНН',
+    'form.kpp': 'КПП',
+    'form.ogrn': 'ОГРН/ОГРНИП',
+    'form.legal_address': 'Юридический адрес',
+    'form.bik': 'БИК',
+    'form.account_number': 'р/с',
+    'form.contract_number': 'Номер договора',
+    'form.contract_date': 'Дата заключения договора',
+    'form.use_auto_marketing': 'Использовать автомаркировку в ОРД',
+    
+    // Actions
+    'action.edit': 'Редактировать',
+    'action.copy': 'Копировать',
+    'action.delete': 'Удалить',
+    'action.view': 'Посмотреть',
+    'action.create': 'Создать',
+    'action.export': 'Экспорт',
+    'action.refresh': 'Обновить',
+    'action.duplicate': 'Дублировать',
+    'action.pause': 'Приостановить',
+    'action.resume': 'Возобновить',
+    
+    // Messages
+    'campaign.copied_successfully': 'Кампания скопирована успешно',
+    'advertiser.copied_successfully': 'Рекламодатель скопирован успешно',
+    'advertiser.created_successfully': 'Рекламодатель создан успешно',
+    'campaign.created_successfully': 'Кампания создана успешно',
+    'adgroup.created_successfully': 'Группа объявлений создана успешно',
+    'creative.created_successfully': 'Креатив создан успешно',
+    
+    // Validation
+    'form.required_field': 'Это поле обязательно',
+    'form.invalid_inn': 'ИНН должен содержать 12 цифр',
+    'form.invalid_kpp': 'КПП должен содержать 9 цифр',
+    'form.invalid_ogrn': 'ОГРН должен содержать 15 цифр',
+    'form.invalid_bik': 'БИК должен содержать 9 цифр',
+    'form.invalid_account': 'Номер счета должен содержать 20 цифр',
+    'form.validation_error': 'Исправьте ошибки валидации',
+    'form.enter_advertiser_name': 'Введите название рекламодателя',
+    'form.enter_legal_name': 'Введите юридическое название',
+    'form.enter_contract_number': 'Введите номер договора',
+    'form.enter_legal_address': 'Введите юридический адрес',
+    'form.enter_description': 'Введите описание',
+    'form.enter_adgroup_name': 'Введите название группы объявлений',
+    'form.enter_creative_title': 'Где лучше тусовать...',
+    'form.enter_creative_text': 'Килограммы денег просто так...',
+    'form.period': 'Период',
+    'form.creative_notice': 'Обратите внимание, что все созданные объявления будут рассмотрены модерацией.',
+    'form.note_token': 'Примечание: Генерация токенов',
+    'form.token_generation_info': 'Токены будут автоматически сгенерированы в ссылке.',
+    'action.exit': 'Выход',
+    
+    // Time periods
+    'time.day': 'День',
+    'time.week': 'Неделя',
+    'time.month': 'Месяц',
+    'time.whole_campaign': 'Вся кампания',
+    
+    // Additional statuses
+    'status.pending': 'В ожидании',
+    'status.rejected': 'Отклонена'
   }
 }
 

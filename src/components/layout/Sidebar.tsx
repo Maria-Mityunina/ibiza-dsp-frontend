@@ -131,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           {/* Header */}
           <div className="flex items-center justify-between h-20 px-6">
             <div className="flex-1 flex justify-center">
-              <h1 className="text-3xl font-light text-black font-['Montserrat']">IBIZA DSP</h1>
+                                <h1 className="text-3xl font-light text-black">IBIZA DSP</h1>
             </div>
             
             {/* Close button for mobile */}
@@ -153,7 +153,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                   {/* Section header - только в развернутом состоянии */}
                   {!false && (
                     <div 
-                      className="flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 cursor-pointer hover:text-black transition-all duration-300 rounded-xl hover:bg-black/5 font-['Montserrat']"
+                      className="flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 cursor-pointer hover:text-black transition-all duration-300 rounded-xl hover:bg-black/5"
                       onClick={() => toggleSection(section.id)}
                     >
                       <span>{section.title}</span>
@@ -194,7 +194,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                             key={item.name}
                             to={item.href}
                             className={clsx(
-                              'group flex items-center text-sm font-medium rounded-xl transition-all duration-300 font-["Montserrat"] relative',
+                              'group flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative',
                               false ? 'px-3 py-3 justify-center' : 'px-4 py-3',
                               active
                                 ? 'bg-black/10 text-black border-l-4 border-black backdrop-blur-sm'
