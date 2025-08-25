@@ -144,7 +144,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-6 py-4 space-y-4 overflow-y-auto">
+          <nav className="flex-1 px-6 py-4 space-y-4 overflow-y-auto scrollbar-hide">
             {menuSections.map((section) => {
               const isExpanded = expandedSections.includes(section.id)
 
