@@ -39,7 +39,7 @@ const InteractiveAreaChart: React.FC<InteractiveAreaChartProps> = ({
 
   const xScale = scaleTime({
     range: [0, innerWidth],
-    domain: [Math.min(...data.map(getX)), Math.max(...data.map(getX))]
+    domain: [Math.min(...data.map(d => getX(d).getTime())), Math.max(...data.map(d => getX(d).getTime()))]
   })
 
   const yScale = scaleLinear({

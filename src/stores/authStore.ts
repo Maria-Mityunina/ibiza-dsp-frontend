@@ -1,6 +1,23 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { User, LoginCredentials, Permission, UserRole } from '@types/auth'
+// Auth Types
+type UserRole = 'employee_admin' | 'employee_traffic' | 'advertiser_admin' | 'advertiser_traffic'
+type Permission = string
+
+interface User {
+  id: string
+  username: string
+  email: string
+  role: UserRole
+  permissions: Permission[]
+  createdAt: string
+  lastLogin: string
+}
+
+interface LoginCredentials {
+  username: string
+  password: string
+}
 import { getPermissionsForRole, getRoleDisplayName } from '@utils/rolePermissions'
 
 interface AuthState {

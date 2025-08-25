@@ -35,7 +35,7 @@ const LineChartInner: React.FC<LineChartProps> = ({
   // Scales
   const xScale = scaleTime({
     range: [0, innerWidth],
-    domain: [Math.min(...data.map(getDate)), Math.max(...data.map(getDate))],
+    domain: [Math.min(...data.map(d => getDate(d).getTime())), Math.max(...data.map(d => getDate(d).getTime()))],
   })
 
   const yScale = scaleLinear({

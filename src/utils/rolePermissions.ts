@@ -1,4 +1,6 @@
-import { UserRole, Permission } from '@types/auth'
+// Role permission types
+type UserRole = 'employee_admin' | 'employee_traffic' | 'advertiser_admin' | 'advertiser_traffic'
+type Permission = string
 
 /**
  * Разрешения для каждой роли согласно техническому заданию

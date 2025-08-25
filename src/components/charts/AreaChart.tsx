@@ -35,7 +35,7 @@ const AreaChartInner: React.FC<AreaChartProps> = ({
   // Scales
   const dateScale = scaleTime<number>({
     range: [0, xMax],
-    domain: [Math.min(...data.map(getDate)), Math.max(...data.map(getDate))],
+    domain: [Math.min(...data.map(d => getDate(d).getTime())), Math.max(...data.map(d => getDate(d).getTime()))],
   })
 
   const impressionsScale = scaleLinear<number>({

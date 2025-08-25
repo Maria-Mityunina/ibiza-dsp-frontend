@@ -1,8 +1,19 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import type { ApiResponse, ApiError } from '@types/common'
+// API Types
+interface ApiResponse<T = any> {
+  data: T
+  message?: string
+  success: boolean
+}
+
+interface ApiError {
+  message: string
+  code?: string
+  details?: any
+}
 
 // Базовый URL API (в продакшене будет заменен на реальный)
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+const API_BASE_URL = (import.meta.env?.VITE_API_URL as string) || 'http://localhost:8000/api'
 
 // Создание экземпляра axios
 const apiClient: AxiosInstance = axios.create({
@@ -61,31 +72,31 @@ export class ApiClient {
   // GET запрос
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.get<ApiResponse<T>>(url, config)
-    return response.data.data
+    return response.data.data as T
   }
 
   // POST запрос
   async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.post<ApiResponse<T>>(url, data, config)
-    return response.data.data
+    return response.data.data as T
   }
 
   // PUT запрос
   async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.put<ApiResponse<T>>(url, data, config)
-    return response.data.data
+    return response.data.data as T
   }
 
   // PATCH запрос
   async patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.patch<ApiResponse<T>>(url, data, config)
-    return response.data.data
+    return response.data.data as T
   }
 
   // DELETE запрос
   async delete<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     const response = await this.client.delete<ApiResponse<T>>(url, config)
-    return response.data.data
+    return response.data.data as T
   }
 
   // Загрузка файлов
@@ -105,7 +116,7 @@ export class ApiClient {
       },
     })
 
-    return response.data.data
+    return response.data.data as T
   }
 
   // Скачивание файлов

@@ -382,7 +382,7 @@ export const useLanguageStore = create<LanguageState>()(
       
       t: (key: string, fallback?: string) => {
         const { language } = get()
-        const translation = translations[language]?.[key]
+        const translation = (translations as any)[language]?.[key]
         return translation || fallback || key
       }
     }),

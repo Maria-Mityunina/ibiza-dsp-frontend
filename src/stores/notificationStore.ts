@@ -1,5 +1,16 @@
 import { create } from 'zustand'
-import type { Notification, NotificationType } from '@types/common'
+
+// Notification types
+type NotificationType = 'success' | 'error' | 'warning' | 'info'
+
+interface Notification {
+  id: string
+  type: NotificationType
+  title: string
+  message?: string
+  duration?: number
+  autoClose?: boolean
+}
 
 interface NotificationState {
   notifications: Notification[]

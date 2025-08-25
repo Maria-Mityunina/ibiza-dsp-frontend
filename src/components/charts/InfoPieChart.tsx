@@ -49,7 +49,7 @@ const InfoPieChartInner: React.FC<InfoPieChartProps> = ({
     sort: null,
   })
 
-  const arcs = pieGenerator(data)
+  const _ = pieGenerator(data) // Не используется
 
   return (
     <div className="w-full h-full flex items-center justify-between bg-white overflow-hidden">

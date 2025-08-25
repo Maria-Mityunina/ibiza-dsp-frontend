@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { Group } from '@visx/group'
-import { Bar } from '@visx/shape'
+// import { Bar } from '@visx/shape' // Не используется
 import { scaleBand, scaleLinear } from '@visx/scale'
 import { AxisBottom, AxisLeft } from '@visx/axis'
 import { GridRows } from '@visx/grid'

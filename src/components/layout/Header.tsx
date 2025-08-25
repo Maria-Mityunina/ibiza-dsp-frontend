@@ -93,7 +93,7 @@ const Header: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-900">
-                          {user?.name || 'User'}
+                          {user?.username || 'User'}
                         </p>
                         <p className="text-xs text-gray-500">
                           {user?.email || 'user@example.com'}
@@ -171,7 +171,7 @@ const Header: React.FC = () => {
           <div className="flex items-center space-x-3">
             <div className="hidden md:block text-right">
               <p className="text-sm font-medium text-gray-900">
-                {user?.name || 'DSP Manager'}
+                {user?.username || 'DSP Manager'}
               </p>
               <p className="text-xs text-gray-500">
                 {user?.role || 'Administrator'}
