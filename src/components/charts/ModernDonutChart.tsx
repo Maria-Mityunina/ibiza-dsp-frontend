@@ -34,11 +34,10 @@ const ModernDonutChart: React.FC<ModernDonutChartProps> = ({
   const centerX = width / 2
   const centerY = height / 2
 
-  const pieGenerator = pie<DonutData>({
-    value: (d) => d.value,
-    sort: null,
-    padAngle: 0.02
-  })
+  const pieGenerator = pie<DonutData>()
+    .value((d) => d.value)
+    .sort(null)
+    .padAngle(0.02)
 
   const total = data.reduce((sum, d) => sum + d.value, 0)
 

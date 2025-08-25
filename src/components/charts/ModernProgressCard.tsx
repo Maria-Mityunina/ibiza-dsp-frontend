@@ -39,7 +39,7 @@ const ModernProgressCard: React.FC<ModernProgressCardProps> = ({
 
   return (
     <motion.div
-      whileHover={{ y: -2, shadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
+      whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
       className={`bg-white rounded-3xl p-6 shadow-lg border border-gray-100 hover:border-gray-200 transition-all duration-300 ${className}`}
     >

@@ -43,7 +43,7 @@ const ModernLineChart: React.FC<ModernLineChartProps> = ({
     () =>
       scaleTime({
         range: [0, innerWidth],
-        domain: [Math.min(...data.map(getX)), Math.max(...data.map(getX))]
+        domain: [Math.min(...data.map(d => getX(d).getTime())), Math.max(...data.map(d => getX(d).getTime()))]
       }),
     [innerWidth, data]
   )

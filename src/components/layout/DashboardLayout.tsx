@@ -45,7 +45,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           className="flex-1 flex flex-col min-w-0 pr-6"
         >
           {/* Header */}
-          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          <Header />
           
           {/* Page content */}
           <main className="flex-1 overflow-auto">

@@ -131,7 +131,7 @@ const AreaChartInner: React.FC<AreaChartProps> = ({
             top={yMax}
             scale={dateScale}
             tickFormat={(value) => {
-              const date = new Date(value)
+              const date = new Date(value as any)
               return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}`
             }}
             stroke="#9CA3AF"
