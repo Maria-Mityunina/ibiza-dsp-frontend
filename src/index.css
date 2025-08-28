@@ -4,27 +4,27 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom Status Colors */
+/* Monochrome Status Variables (legacy support) */
 :root {
-  /* Border colors - яркие цвета для обводки */
-  --status-active-border: #BFFFD0;
-  --status-rejected-border: #CC4433;
-  --status-pending-border: #FFEB85;
-  --status-draft-border: #C7BBB8;
-  --status-completed-border: #C9C9B8;
-  --status-paused-border: #FFEB85;
-  --status-stopped-border: #CC4433;
-  --status-inactive-border: #C7BBB8;
+  /* Soft monochrome borders */
+  --status-active-border: rgba(255, 255, 255, 0.4);
+  --status-rejected-border: rgba(255, 255, 255, 0.3);
+  --status-pending-border: rgba(255, 255, 255, 0.3);
+  --status-draft-border: rgba(255, 255, 255, 0.25);
+  --status-completed-border: rgba(255, 255, 255, 0.35);
+  --status-paused-border: rgba(255, 255, 255, 0.3);
+  --status-stopped-border: rgba(255, 255, 255, 0.3);
+  --status-inactive-border: rgba(255, 255, 255, 0.25);
   
-  /* Text colors - яркие цвета для текста */
-  --status-active-text: #0A8020;
-  --status-rejected-text: #CC4433;
-  --status-pending-text: #B8940A;
-  --status-draft-text: #8A7B78;
-  --status-completed-text: #7A7A68;
-  --status-paused-text: #B8940A;
-  --status-stopped-text: #CC4433;
-  --status-inactive-text: #8A7B78;
+  /* Monochrome text colors */
+  --status-active-text: #1f2937;
+  --status-rejected-text: #6b7280;
+  --status-pending-text: #6b7280;
+  --status-draft-text: #9ca3af;
+  --status-completed-text: #6b7280;
+  --status-paused-text: #374151;
+  --status-stopped-text: #6b7280;
+  --status-inactive-text: #9ca3af;
 }
 
 @layer base {
@@ -141,51 +141,59 @@
     border-color: rgba(244, 63, 94, 0.4);
   }
 
-  /* Status Badge Styles */
+  /* Status Badge Styles - Glass Morphism */
   .status-active {
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(8px);
     color: var(--status-active-text);
     border: 1px solid var(--status-active-border);
   }
 
   .status-pending {
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
     color: var(--status-pending-text);
     border: 1px solid var(--status-pending-border);
   }
 
   .status-paused {
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
     color: var(--status-paused-text);
     border: 1px solid var(--status-paused-border);
   }
 
   .status-stopped {
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
     color: var(--status-stopped-text);
     border: 1px solid var(--status-stopped-border);
   }
 
   .status-rejected {
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(8px);
     color: var(--status-rejected-text);
     border: 1px solid var(--status-rejected-border);
   }
 
   .status-draft {
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
     color: var(--status-draft-text);
     border: 1px solid var(--status-draft-border);
   }
 
   .status-inactive {
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
     color: var(--status-inactive-text);
     border: 1px solid var(--status-inactive-border);
   }
 
   .status-completed {
-    background-color: transparent;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
     color: var(--status-completed-text);
     border: 1px solid var(--status-completed-border);
   }

@@ -8,10 +8,10 @@ import {
   TrendingDown, 
   Eye, 
   MousePointer, 
-  DollarSign, 
-  Target, 
+  DollarSign,
+  Target,
   Users, 
-  Activity, 
+  Activity,
   Clock,
   Award,
   RefreshCw,
@@ -241,39 +241,39 @@ const AnalyticsPage: React.FC = () => {
                 <ChevronDown className="w-4 h-4" />
               </button>
               <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-20 min-w-[140px]">
-                <button
+          <button 
                   onClick={() => handleExport('csv')}
                   className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl transition-colors"
                 >
                   Export CSV
-                </button>
-                <button
+          </button>
+            <button 
                   onClick={() => handleExport('xlsx')}
                   className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   Export Excel
-                </button>
-                <button
+            </button>
+            <button 
                   onClick={() => handleExport('pdf')}
                   className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-b-xl transition-colors"
                 >
                   Export PDF
-                </button>
-              </div>
-            </div>
+            </button>
+          </div>
+        </div>
           </div>
         }
       />
 
-      <div className="px-4 sm:px-6 lg:px-8 pb-6 space-y-6">
-        {/* Breadcrumb */}
+      <div className="pb-6 space-y-6">
+                {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <span>Dashboards</span>
           <ChevronDown className="w-4 h-4 transform rotate-[-90deg]" />
           <span className="text-gray-900 font-medium">Analytics</span>
         </div>
 
-        {/* Top KPI Cards */}
+                {/* Top KPI Cards */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -290,8 +290,8 @@ const AnalyticsPage: React.FC = () => {
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600">
                   <kpi.icon className="w-6 h-6" />
-                </div>
-                <div className="text-right">
+              </div>
+              <div className="text-right">
                   <div className="flex items-center gap-1 text-sm">
                     {getTrendIcon(kpi.trend)}
                     <span className={`font-medium ${
@@ -300,11 +300,11 @@ const AnalyticsPage: React.FC = () => {
                     }`}>
                       +{kpi.change}%
                     </span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">Increased</p>
                 </div>
+                  <p className="text-xs text-gray-500 mt-1">Increased</p>
               </div>
-
+            </div>
+            
               <div>
                 <p className="text-gray-600 text-sm font-medium mb-1">{kpi.title}</p>
                 <p className="text-3xl font-bold text-gray-900 mb-4">
@@ -314,18 +314,18 @@ const AnalyticsPage: React.FC = () => {
                 {/* Mini Chart */}
                 <div className="flex items-end justify-between h-8 gap-1">
                   {kpi.chartData.map((value, i) => (
-                    <div
-                      key={i}
+                <div
+                  key={i}
                       className="flex-1 bg-gray-200 rounded-t hover:bg-gray-400 transition-colors cursor-pointer"
                       style={{ height: `${value}%` }}
                       onClick={() => info(`${kpi.title}: ${value}%`)}
-                    />
-                  ))}
+                />
+              ))}
                 </div>
-              </div>
+            </div>
             </motion.div>
           ))}
-        </motion.div>
+          </motion.div>
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -337,26 +337,26 @@ const AnalyticsPage: React.FC = () => {
             className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-6"
           >
             <div className="flex items-center justify-between mb-6">
-              <div>
+                <div>
                 <h3 className="text-lg font-semibold text-gray-900">Session Duration By Users</h3>
                 <div className="flex items-center gap-6 mt-2 text-sm">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
                     <span className="text-gray-600">Orders</span>
-                  </div>
+                </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
                     <span className="text-gray-600">Sales</span>
-                  </div>
+              </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 bg-red-400 rounded-full"></div>
                     <span className="text-gray-600">Profit</span>
-                  </div>
                 </div>
+              </div>
               </div>
               <MoreVertical className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
             </div>
-
+            
             {/* Chart */}
             <div className="h-80 relative">
               <div className="absolute inset-0 flex items-end justify-between px-4">
@@ -432,8 +432,8 @@ const AnalyticsPage: React.FC = () => {
                   <div className="text-2xl font-bold text-gray-900">219,147</div>
                   <div className="text-sm text-gray-500">Total Visitors</div>
                 </div>
+                </div>
               </div>
-            </div>
 
             {/* Legend */}
             <div className="space-y-3 mb-6">
@@ -452,7 +452,7 @@ const AnalyticsPage: React.FC = () => {
                 <span className="text-sm font-bold text-gray-900">32,389</span>
               </div>
             </div>
-
+            
             {/* Audience Report */}
             <div className="p-4 bg-gray-50 rounded-xl">
               <div className="flex items-center justify-between mb-3">
@@ -510,11 +510,11 @@ const AnalyticsPage: React.FC = () => {
                         />
                       )
                     })}
-                  </div>
+                </div>
                 </div>
               ))}
             </div>
-
+            
             <div className="flex justify-between text-xs text-gray-500">
               <span>12Am</span>
               <span>6Am</span>
@@ -545,14 +545,14 @@ const AnalyticsPage: React.FC = () => {
                       style={{ backgroundColor: browser.color }}
                     >
                       {browser.name.charAt(0)}
-                    </div>
+        </div>
                     <span className="text-sm font-medium text-gray-900">{browser.name}</span>
-                  </div>
-                  
+      </div>
+
                   <div className="text-right">
                     <div className="text-sm font-bold text-gray-900">
                       {formatNumber(browser.sessions)}
-                    </div>
+              </div>
                     <div className={`text-xs flex items-center gap-1 ${
                       browser.change > 0 ? 'text-green-600' : 'text-red-500'
                     }`}>
@@ -562,9 +562,9 @@ const AnalyticsPage: React.FC = () => {
                         <TrendingDown className="w-3 h-3" />
                       )}
                       <span>{browser.change > 0 ? '+' : ''}{browser.change}%</span>
-                    </div>
-                  </div>
-                </div>
+            </div>
+              </div>
+            </div>
               ))}
             </div>
           </motion.div>
@@ -590,8 +590,8 @@ const AnalyticsPage: React.FC = () => {
                         style={{ width: `${value}%` }}
                         onClick={() => info(`${country}: ${Math.round(value)}% sessions`)}
                       />
-                    </div>
-                  </div>
+              </div>
+            </div>
                 )
               })}
             </div>
@@ -604,7 +604,7 @@ const AnalyticsPage: React.FC = () => {
               <span>800</span>
               <span>1000</span>
               <span>1200</span>
-            </div>
+              </div>
           </motion.div>
 
           {/* Visitors By Countries */}
@@ -619,7 +619,7 @@ const AnalyticsPage: React.FC = () => {
               <button className="text-gray-600 hover:text-gray-800 text-sm font-medium">
                 View All
               </button>
-            </div>
+              </div>
             
             <div className="space-y-4">
               {countriesData.map((country, index) => (
@@ -631,15 +631,15 @@ const AnalyticsPage: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <span className="text-lg">{country.flag}</span>
                     <span className="text-sm font-medium text-gray-900">{country.name}</span>
-                  </div>
+              </div>
                   <span className="text-sm font-bold text-gray-900">
                     {formatNumber(country.visitors)}
                   </span>
-                </div>
+            </div>
               ))}
             </div>
           </motion.div>
-        </div>
+      </div>
 
         {/* Bottom Section */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -670,8 +670,8 @@ const AnalyticsPage: React.FC = () => {
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-red-400 rounded-xl flex items-center justify-center text-white">
                   <CreditCard className="w-5 h-5" />
-                </div>
-                <div>
+                  </div>
+                  <div>
                   <div className="text-sm text-gray-600">Cost</div>
                   <div className="text-2xl font-bold text-gray-900">$6,156.38</div>
                   <div className="text-sm text-green-600 flex items-center gap-1">
@@ -679,8 +679,8 @@ const AnalyticsPage: React.FC = () => {
                     2.50%
                   </div>
                 </div>
+                </div>
               </div>
-            </div>
 
             <div className="bg-white border border-gray-200 rounded-2xl p-6">
               <div className="space-y-4">
@@ -688,31 +688,31 @@ const AnalyticsPage: React.FC = () => {
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white">
                       <TrendingUp className="w-4 h-4" />
-                    </div>
-                    <div>
+                  </div>
+                  <div>
                       <div className="text-sm text-gray-600">Productivity</div>
                       <div className="text-lg font-bold text-gray-900">$95.5M</div>
                       <div className="text-xs text-green-600 flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
                         4.77%
-                      </div>
-                    </div>
                   </div>
                 </div>
+                </div>
+              </div>
 
                 <div>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white">
                       <Clock className="w-4 h-4" />
-                    </div>
-                    <div>
+                  </div>
+                  <div>
                       <div className="text-sm text-gray-600">Total Time On Project</div>
                       <div className="text-lg font-bold text-gray-900">148:00h</div>
                       <div className="text-xs text-green-600 flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" />
                         3.36%
-                      </div>
-                    </div>
+                  </div>
+                </div>
                   </div>
                 </div>
               </div>
@@ -772,24 +772,24 @@ const AnalyticsPage: React.FC = () => {
             {/* Project Statistics */}
             <div className="space-y-4">
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
+                    <div>
                   <div className="text-lg font-bold text-gray-900">166 ↑</div>
                   <div className="text-xs text-gray-500">Active Projects</div>
                   <div className="text-xs text-green-600">+0.9%</div>
                   <div className="text-xs text-gray-400">More Projects are yet to start</div>
-                </div>
+                    </div>
                 <div>
                   <div className="text-lg font-bold text-gray-900">538 ↑</div>
                   <div className="text-xs text-gray-500">Completed Projects</div>
                   <div className="text-xs text-green-600">+0.39%</div>
                   <div className="text-xs text-gray-400">32 Completed this year</div>
-                </div>
+                  </div>
                 <div>
                   <div className="text-lg font-bold text-red-500">$32,124.00 ↑</div>
                   <div className="text-xs text-gray-500">Project Revenue</div>
                   <div className="text-xs text-red-500">-0.15%</div>
                   <div className="text-xs text-gray-400">Reached yearly target</div>
-                </div>
+                  </div>
               </div>
 
               {/* Chart */}
@@ -809,8 +809,8 @@ const AnalyticsPage: React.FC = () => {
                       />
                     </div>
                     <span className="text-xs text-gray-500">{data.month}</span>
-                  </div>
-                ))}
+                </div>
+              ))}
               </div>
             </div>
           </motion.div>
@@ -841,8 +841,8 @@ const AnalyticsPage: React.FC = () => {
                         : 'border-gray-300 hover:border-gray-400'
                     }`}>
                       {todo.completed && <CheckCircle className="w-3 h-3" />}
-                    </div>
-                    
+            </div>
+
                     <div className="flex-1">
                       <div className={`font-medium ${
                         todo.completed ? 'text-green-700 line-through' : 'text-gray-900'
@@ -850,8 +850,8 @@ const AnalyticsPage: React.FC = () => {
                         {todo.title}
                       </div>
                       <div className="text-sm text-gray-500">{todo.dueDate}</div>
-                    </div>
-                    
+              </div>
+
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(todo.priority)}`}>
                         {todo.priority}
@@ -865,11 +865,11 @@ const AnalyticsPage: React.FC = () => {
                       >
                         <Edit className="w-4 h-4" />
                       </button>
-                    </div>
+                </div>
                   </div>
                 ))}
+                </div>
               </div>
-            </div>
 
             {/* Recent Transactions */}
             <div className="bg-white border border-gray-200 rounded-2xl p-6">
@@ -914,9 +914,9 @@ const AnalyticsPage: React.FC = () => {
                   <div className="flex items-center gap-1 text-green-600">
                     <TrendingUp className="w-4 h-4" />
                     <span className="font-medium">0.45%</span>
-                  </div>
-                </div>
-                
+        </div>
+      </div>
+
                 <div className="relative w-20 h-20">
                   <svg className="w-full h-full transform -rotate-90">
                     <circle cx="40" cy="40" r="35" stroke="#E5E7EB" strokeWidth="6" fill="none" />
@@ -953,12 +953,12 @@ const AnalyticsPage: React.FC = () => {
                         points="0,20 8,15 16,25 24,20 32,10 40,15 48,5 56,10 64,15"
                       />
                     </svg>
-                  </div>
+        </div>
                 </div>
               </div>
             </div>
           </motion.div>
-        </div>
+      </div>
 
         {/* Activity Section */}
         <motion.div
@@ -967,10 +967,10 @@ const AnalyticsPage: React.FC = () => {
           transition={{ delay: 1.3 }}
           className="bg-white border border-gray-200 rounded-2xl p-6"
         >
-          <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Activity</h3>
             <MoreVertical className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
-          </div>
+            </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
             {activityData.map((activity, index) => (
@@ -1017,3 +1017,4 @@ const AnalyticsPage: React.FC = () => {
 }
 
 export default AnalyticsPage
+

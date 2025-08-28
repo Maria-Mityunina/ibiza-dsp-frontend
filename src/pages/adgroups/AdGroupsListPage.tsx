@@ -196,14 +196,14 @@ const AdGroupsListPage: React.FC = () => {
       {/* Ad Groups List */}
       <div className="space-y-4">
         
-                <div className="divide-y divide-gray-200">
+                <div className="space-y-4">
           {adGroups.map((adGroup) => {
             return (
               <motion.div
                 key={adGroup.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-6 hover:bg-gray-50 transition-colors"
+                className="bg-white/20 backdrop-blur-md border border-white/30 rounded-xl p-6 shadow-lg hover:bg-white/25 transition-all duration-300"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
@@ -261,7 +261,7 @@ const AdGroupsListPage: React.FC = () => {
                   <div className="flex items-center space-x-2 ml-4">
                     <button
                       onClick={() => copyAdGroup(adGroup)}
-                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-lg transition-all duration-200"
                       title={t('action.duplicate')}
                     >
                       <Copy className="w-4 h-4" />
@@ -272,7 +272,7 @@ const AdGroupsListPage: React.FC = () => {
                         e.stopPropagation()
                         openEditForm(adGroup)
                       }}
-                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-lg transition-all duration-200"
                       title={t('action.edit')}
                     >
                       <Edit className="w-4 h-4" />
@@ -283,7 +283,7 @@ const AdGroupsListPage: React.FC = () => {
                         e.stopPropagation()
                         handleDeleteAdGroup(adGroup.id)
                       }}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-lg transition-all duration-200"
                       title="Удалить"
                     >
                       <Trash2 className="w-4 h-4" />

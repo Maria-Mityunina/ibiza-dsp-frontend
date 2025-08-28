@@ -25,52 +25,58 @@ const StatusControl: React.FC<StatusControlProps> = ({
       case 'draft':
         return {
           label: 'Черновик',
-          color: 'status-draft',
           icon: Clock,
-          statusClass: 'status-draft'
+          bgClass: 'bg-white/20 backdrop-blur-sm',
+          textClass: 'text-gray-600',
+          borderClass: 'border-white/30'
         }
       case 'pending':
         return {
           label: 'На модерации',
-          color: 'status-pending',
           icon: Clock,
-          statusClass: 'status-pending'
+          bgClass: 'bg-white/20 backdrop-blur-sm',
+          textClass: 'text-gray-600',
+          borderClass: 'border-white/30'
         }
       case 'active':
         return {
           label: 'Активна',
-          color: 'status-active',
           icon: Play,
-          statusClass: 'status-active'
+          bgClass: 'bg-white/30 backdrop-blur-sm',
+          textClass: 'text-slate-900',
+          borderClass: 'border-white/40'
         }
       case 'paused':
         return {
           label: 'Приостановлена',
-          color: 'status-paused',
           icon: Pause,
-          statusClass: 'status-paused'
+          bgClass: 'bg-white/20 backdrop-blur-sm',
+          textClass: 'text-gray-700',
+          borderClass: 'border-white/30'
         }
-
       case 'completed':
         return {
           label: 'Завершена',
-          color: 'status-completed',
           icon: CheckCircle,
-          statusClass: 'status-completed'
+          bgClass: 'bg-white/25 backdrop-blur-sm',
+          textClass: 'text-gray-600',
+          borderClass: 'border-white/35'
         }
       case 'rejected':
         return {
           label: 'Отклонена',
-          color: 'status-rejected',
           icon: X,
-          statusClass: 'status-rejected'
+          bgClass: 'bg-white/20 backdrop-blur-sm',
+          textClass: 'text-gray-600',
+          borderClass: 'border-white/30'
         }
       default:
         return {
           label: 'Неизвестно',
-          color: 'status-inactive',
           icon: Clock,
-          statusClass: 'status-inactive'
+          bgClass: 'bg-white/15 backdrop-blur-sm',
+          textClass: 'text-gray-500',
+          borderClass: 'border-white/25'
         }
     }
   }
@@ -79,20 +85,23 @@ const StatusControl: React.FC<StatusControlProps> = ({
     switch (size) {
       case 'sm':
         return {
+          badge: 'px-2 py-1 text-xs',
           button: 'px-2 py-1 text-xs',
           icon: 'h-3 w-3',
           gap: 'gap-1'
         }
       case 'md':
         return {
-          button: 'px-3 py-2 text-sm',
-          icon: 'h-4 w-4',
-          gap: 'gap-2'
+          badge: 'px-2.5 py-1.5 text-xs',
+          button: 'px-2.5 py-1.5 text-xs',
+          icon: 'h-3.5 w-3.5',
+          gap: 'gap-1.5'
         }
       case 'lg':
         return {
-          button: 'px-4 py-3 text-base',
-          icon: 'h-5 w-5',
+          badge: 'px-3 py-2 text-sm',
+          button: 'px-3 py-2 text-sm',
+          icon: 'h-4 w-4',
           gap: 'gap-2'
         }
     }
@@ -124,20 +133,20 @@ const StatusControl: React.FC<StatusControlProps> = ({
 
   return (
     <div className={`flex items-center ${sizeClasses.gap} ${className}`}>
-      {/* Status Badge */}
+      {/* Status Badge - Glass Style */}
       <div 
         className={`
-          inline-flex items-center ${sizeClasses.gap} ${sizeClasses.button} 
-          ${statusConfig.statusClass}
-          border rounded-lg font-normal
+          inline-flex items-center ${sizeClasses.gap} ${sizeClasses.badge}
+          ${statusConfig.bgClass} ${statusConfig.textClass} ${statusConfig.borderClass}
+          border rounded-lg font-medium transition-all duration-200 hover:bg-white/35
         `}
         style={{ fontFamily: 'Montserrat, sans-serif' }}
       >
         <Icon className={sizeClasses.icon} />
-        {showLabel && <span>{statusConfig.label}</span>}
+        {showLabel && <span className="truncate">{statusConfig.label}</span>}
       </div>
 
-      {/* Control Buttons */}
+      {/* Control Buttons - Monochrome Style */}
       {!disabled && (status !== 'completed' && status !== 'rejected') && (
         <div className="flex items-center gap-1">
           {canStart && (
@@ -147,8 +156,9 @@ const StatusControl: React.FC<StatusControlProps> = ({
               onClick={() => handleAction('start')}
               className={`
                 flex items-center justify-center ${sizeClasses.button}
-                bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 
-                transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400
+                bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 rounded-lg 
+                hover:bg-white/30 hover:text-slate-900 transition-all duration-200 
+                focus:outline-none focus:ring-2 focus:ring-white/50
               `}
               title="Запустить"
             >
@@ -164,8 +174,9 @@ const StatusControl: React.FC<StatusControlProps> = ({
               onClick={() => handleAction('pause')}
               className={`
                 flex items-center justify-center ${sizeClasses.button}
-                bg-sky-500 text-white rounded-lg hover:bg-sky-600 
-                transition-colors focus:outline-none focus:ring-2 focus:ring-sky-400
+                bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 rounded-lg 
+                hover:bg-white/30 hover:text-slate-900 transition-all duration-200 
+                focus:outline-none focus:ring-2 focus:ring-white/50
               `}
               title="Приостановить"
             >
@@ -181,8 +192,9 @@ const StatusControl: React.FC<StatusControlProps> = ({
               onClick={() => handleAction('stop')}
               className={`
                 flex items-center justify-center ${sizeClasses.button}
-                bg-rose-400 text-white rounded-lg hover:bg-rose-500 
-                transition-colors focus:outline-none focus:ring-2 focus:ring-rose-300
+                bg-white/20 backdrop-blur-sm border border-white/30 text-gray-700 rounded-lg 
+                hover:bg-white/30 hover:text-slate-900 transition-all duration-200 
+                focus:outline-none focus:ring-2 focus:ring-white/50
               `}
               title="Остановить"
             >
