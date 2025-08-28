@@ -55,7 +55,7 @@ const InteractiveAreaChart: React.FC<InteractiveAreaChartProps> = ({
   })
 
   return (
-    <div className={`bg-white rounded-3xl p-6 shadow-lg border border-gray-100 ${className}`}>
+    <div className={`bg-transparent rounded-lg p-0 w-full ${className}`}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900 font-['Montserrat']">
           {title}
@@ -68,11 +68,11 @@ const InteractiveAreaChart: React.FC<InteractiveAreaChartProps> = ({
             onClick={() => setHoveredMetric(hoveredMetric === 'impressions' ? null : 'impressions')}
             className={`flex items-center space-x-2 px-3 py-1 rounded-lg transition-all ${
               hoveredMetric === 'impressions' 
-                ? 'bg-emerald-100 text-emerald-700' 
+                ? 'bg-gray-100 text-gray-700' 
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
-            <div className="w-3 h-3 bg-emerald-500 rounded-full" />
+            <div className="w-3 h-3 bg-gray-800 rounded-full" />
             <span className="text-sm font-medium font-['Montserrat']">Показы</span>
           </motion.button>
           
@@ -85,7 +85,7 @@ const InteractiveAreaChart: React.FC<InteractiveAreaChartProps> = ({
                 : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
-            <div className="w-3 h-3 bg-orange-500 rounded-full" />
+            <div className="w-3 h-3 bg-orange-600 rounded-full" />
             <span className="text-sm font-medium font-['Montserrat']">Клики</span>
           </motion.button>
         </div>
@@ -96,19 +96,19 @@ const InteractiveAreaChart: React.FC<InteractiveAreaChartProps> = ({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
-        <svg width={width} height={height}>
+        <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} className="w-full">
           <LinearGradient
             id="impressions-gradient"
-            from="#10b981"
-            to="#10b981"
-            fromOpacity={0.4}
+            from="#1f2937"
+            to="#1f2937"
+            fromOpacity={0.3}
             toOpacity={0}
           />
           <LinearGradient
             id="clicks-gradient"
-            from="#f59e0b"
-            to="#f59e0b"
-            fromOpacity={0.4}
+            from="#ea580c"
+            to="#ea580c"
+            fromOpacity={0.3}
             toOpacity={0}
           />
           
@@ -116,8 +116,10 @@ const InteractiveAreaChart: React.FC<InteractiveAreaChartProps> = ({
             <GridRows
               scale={yScale}
               width={innerWidth}
-              stroke="#f1f5f9"
+              stroke="#9ca3af"
               strokeWidth={1}
+              strokeDasharray="3,3"
+              strokeOpacity={0.3}
             />
             
             {/* Impressions Area */}
@@ -147,8 +149,10 @@ const InteractiveAreaChart: React.FC<InteractiveAreaChartProps> = ({
               data={data}
               x={(d) => xScale(getX(d)) ?? 0}
               y={(d) => yScale(getImpressions(d)) ?? 0}
-              stroke="#10b981"
+              stroke="#1f2937"
               strokeWidth={3}
+              strokeLinecap="round"
+              strokeLinejoin="round"
               opacity={hoveredMetric === 'clicks' ? 0.3 : 1}
             />
             
@@ -157,8 +161,10 @@ const InteractiveAreaChart: React.FC<InteractiveAreaChartProps> = ({
               data={data}
               x={(d) => xScale(getX(d)) ?? 0}
               y={(d) => clicksScale(getClicks(d)) ?? 0}
-              stroke="#f59e0b"
+              stroke="#ea580c"
               strokeWidth={3}
+              strokeLinecap="round"
+              strokeLinejoin="round"
               opacity={hoveredMetric === 'impressions' ? 0.3 : 1}
             />
             

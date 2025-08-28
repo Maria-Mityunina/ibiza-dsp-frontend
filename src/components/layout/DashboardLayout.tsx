@@ -1,71 +1,87 @@
 import React from 'react'
 import { ScrollButtons, ToastContainer } from '@components/ui'
-import { useUIStore } from '@stores/uiStore'
-import Sidebar from './Sidebar'
 import Breadcrumb from './Breadcrumb'
 import Header from './Header'
-import { motion } from 'framer-motion'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false)
-  const { sidebarCollapsed } = useUIStore()
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative">
-      {/* Water texture background */}
-      <div className="absolute inset-0 opacity-20 -z-10">
+    <div className="min-h-screen relative overflow-x-hidden">
+      {/* Clean Monochrome Background */}
+      <div className="fixed inset-0 -z-20">
+        {/* Simple gradient base */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='800' height='600' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cfilter id='water'%3E%3CfeTurbulence baseFrequency='0.05 0.1' numOctaves='3' stitchTiles='stitch'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='8'/%3E%3C/filter%3E%3Cfilter id='ripple'%3E%3CfeTurbulence baseFrequency='0.02 0.03' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.9 0 0 0 0 0.95 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='%23f8fafc' filter='url(%23water)'/%3E%3Ccircle cx='20%25' cy='30%25' r='100' fill='none' stroke='%23e2e8f0' stroke-width='1' opacity='0.4' filter='url(%23ripple)'/%3E%3Ccircle cx='60%25' cy='70%25' r='80' fill='none' stroke='%23e2e8f0' stroke-width='1' opacity='0.3' filter='url(%23ripple)'/%3E%3Ccircle cx='80%25' cy='20%25' r='60' fill='none' stroke='%23e2e8f0' stroke-width='1' opacity='0.2' filter='url(%23ripple)'/%3E%3C/svg%3E")`,
+            background: `
+              linear-gradient(135deg, 
+                rgba(249, 250, 251, 1) 0%,
+                rgba(243, 244, 246, 0.98) 25%,
+                rgba(229, 231, 235, 0.95) 50%,
+                rgba(243, 244, 246, 0.98) 75%,
+                rgba(249, 250, 251, 1) 100%
+              )
+            `
           }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(255,255,255,0.3)_0%,transparent_50%)] bg-[length:600px_600px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(0,0,0,0.02)_0%,transparent_40%)] bg-[length:400px_400px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(255,255,255,0.2)_0%,transparent_30%)] bg-[length:300px_300px]" />
+        
+        {/* Subtle texture overlay */}
+        <div 
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `
+              radial-gradient(circle at 25% 25%, rgba(0,0,0,0.03) 0%, transparent 50%),
+              radial-gradient(circle at 75% 75%, rgba(255,255,255,0.8) 0%, transparent 30%),
+              radial-gradient(circle at 50% 10%, rgba(0,0,0,0.02) 0%, transparent 40%),
+              radial-gradient(circle at 10% 90%, rgba(255,255,255,0.6) 0%, transparent 35%)
+            `,
+            backgroundSize: '400px 400px, 300px 300px, 500px 500px, 350px 350px',
+            backgroundPosition: '0 0, 150px 150px, 50px 200px, 250px 50px'
+          }}
+        />
+        
+        {/* Fine grid pattern */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}
+        />
       </div>
       
-      {/* Main Layout Container */}
-      <div className="flex h-screen gap-6">
-        {/* Sidebar */}
-        <div className="flex-shrink-0">
-          <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
+      {/* Main Layout Container with Glass Effect */}
+      <div className="relative flex flex-col min-h-screen">
+        {/* Header with enhanced glass effect */}
+        <div className="relative z-50">
+          <Header />
         </div>
         
-        {/* Main content area */}
-        <motion.div 
-          animate={{ 
-            marginLeft: sidebarCollapsed ? '0px' : '0px' 
-          }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="flex-1 flex flex-col min-w-0 pr-6"
-        >
-          {/* Header */}
-          <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-          
-          {/* Page content */}
-          <main className="flex-1 overflow-auto max-w-full overflow-x-hidden">
-            {/* Breadcrumb */}
-            <div className="px-8 py-6 border-b border-black/5">
-              <div className="text-gray-600">
+        {/* Page content */}
+        <main className="flex-1 relative z-10">
+          {/* Breadcrumb - transparent */}
+          <div className="w-full">
+            <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 xxl:px-16 py-4 sm:py-6">
+              <div className="text-gray-700">
                 <Breadcrumb />
               </div>
             </div>
-            
-            {/* Page content */}
-            <div className="px-8">
+          </div>
+          
+          {/* Page content - properly centered */}
+          <div className="w-full">
+            <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 xxl:px-16 pb-6">
               {children}
             </div>
-          </main>
-        </motion.div>
+          </div>
+        </main>
       </div>
-
-      {/* Notifications - temporarily disabled */}
-      {/* <NotificationContainer /> */}
       
       {/* Scroll Buttons */}
       <ScrollButtons />

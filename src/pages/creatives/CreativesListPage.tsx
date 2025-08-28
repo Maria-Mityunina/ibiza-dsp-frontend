@@ -1,16 +1,17 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Plus, Edit, Trash2, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer, Image as ImageIcon } from 'lucide-react'
+import { Plus, Edit, Trash2, Copy, Eye, TrendingUp, DollarSign, MousePointer, Image as ImageIcon } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
 import { CreateCreativeForm, EditCreativeForm } from '@components/forms'
+import { StatusControl } from '@components/ui'
 
 interface Creative {
   id: string
   name: string
   type: 'text' | 'image'
-  status: 'active' | 'paused' | 'draft'
+  status: 'active' | 'paused' | 'draft' | 'completed' | 'pending' | 'stopped' | 'rejected'
   title?: string
   text?: string
   imageUrl?: string
@@ -144,12 +145,20 @@ const CreativesListPage: React.FC = () => {
     setShowEditForm(true)
   }
 
-  const toggleCreativeStatus = (id: string) => {
+  const handleStatusChange = (id: string, newStatus: 'active' | 'paused' | 'stopped') => {
     setCreatives(prev => prev.map(creative => 
       creative.id === id 
-        ? { ...creative, status: creative.status === 'active' ? 'paused' : 'active' as any }
+        ? { ...creative, status: newStatus }
         : creative
     ))
+    
+    const statusMessages = {
+      active: 'Креатив запущен',
+      paused: 'Креатив приостановлен', 
+      stopped: 'Креатив остановлен'
+    }
+    
+    success(statusMessages[newStatus])
   }
 
   const copyCreative = (creative: Creative) => {
@@ -167,22 +176,7 @@ const CreativesListPage: React.FC = () => {
     success(t('creative.copied_successfully'))
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800'
-      case 'paused':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'draft':
-        return 'bg-gray-100 text-gray-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
 
-  const getStatusIcon = (status: string) => {
-    return status === 'active' ? Pause : Play
-  }
 
   return (
     <motion.div 
@@ -211,68 +205,7 @@ const CreativesListPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <motion.div 
-          className="bg-blue-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <ImageIcon className="h-5 w-5 text-blue-600" />
-            </div>
-            <span className="text-sm text-gray-600">Всего креативов</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {creatives.length}
-          </div>
-        </motion.div>
-        
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <MousePointer className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.clicks')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {creatives.reduce((sum, creative) => sum + creative.clicks, 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.ctr')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {(creatives.reduce((sum, creative) => sum + creative.ctr, 0) / creatives.length).toFixed(1)}%
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <motion.div 
-          className="bg-orange-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-orange-100 rounded-xl">
-              <DollarSign className="h-5 w-5 text-orange-600" />
-            </div>
-            <span className="text-sm text-gray-600">Потрачено</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            ${creatives.reduce((sum, creative) => sum + creative.spent, 0).toLocaleString()}
-          </div>
-        </motion.div>
-      </div>
+
 
       {/* Creatives List Header */}
       <div className="mb-6">
@@ -284,10 +217,8 @@ const CreativesListPage: React.FC = () => {
       {/* Creatives List */}
       <div className="space-y-4">
         
-        <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-gray-200">
           {creatives.map((creative) => {
-            const StatusIcon = getStatusIcon(creative.status)
-            
             return (
               <motion.div
                 key={creative.id}
@@ -331,9 +262,12 @@ const CreativesListPage: React.FC = () => {
                           </p>
                         </div>
                         
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(creative.status)}`}>
-                          {t(`status.${creative.status}`)}
-                        </span>
+                        <StatusControl
+                          status={creative.status}
+                          onStatusChange={(newStatus) => handleStatusChange(creative.id, newStatus)}
+                          size="sm"
+                          showLabel={true}
+                        />
                       </div>
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
@@ -388,17 +322,7 @@ const CreativesListPage: React.FC = () => {
                       <Trash2 className="w-4 h-4" />
                     </button>
                     
-                    <button
-                      onClick={() => toggleCreativeStatus(creative.id)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        creative.status === 'active' 
-                          ? 'text-yellow-600 hover:bg-yellow-100' 
-                          : 'text-green-600 hover:bg-green-100'
-                      }`}
-                      title={creative.status === 'active' ? t('action.pause') : t('action.resume')}
-                    >
-                      <StatusIcon className="w-4 h-4" />
-                    </button>
+
                   </div>
                 </div>
               </motion.div>

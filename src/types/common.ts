@@ -51,8 +51,9 @@ export interface BaseFilter {
   sortOrder?: 'asc' | 'desc'
 }
 
-// Статусы сущностей
-export type EntityStatus = 'active' | 'inactive' | 'draft' | 'archived'
+// Статусы сущностей - единый список для всего сайта
+export type Status = 'draft' | 'pending' | 'active' | 'paused' | 'rejected' | 'completed'
+export type EntityStatus = Status
 
 // Базовая сущность
 export interface BaseEntity {

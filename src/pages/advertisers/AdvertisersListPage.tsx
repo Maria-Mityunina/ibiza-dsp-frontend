@@ -4,6 +4,7 @@ import { Plus, Edit, Trash2, TrendingUp, DollarSign, Eye, Users } from 'lucide-r
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
 import { CreateAdvertiserForm, EditAdvertiserForm } from '@components/forms'
+import { StatusControl } from '@components/ui'
 
 interface Advertiser {
   id: string
@@ -13,7 +14,7 @@ interface Advertiser {
   spent: number
   ctr: number
   campaigns: number
-  status: 'active' | 'inactive' | 'pending'
+  status: 'active' | 'inactive' | 'pending' | 'draft' | 'paused' | 'stopped' | 'completed' | 'rejected'
   inn?: string
   kpp?: string
   ogrn?: string
@@ -127,17 +128,20 @@ const AdvertisersListPage: React.FC = () => {
     setShowEditForm(true)
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800'
-      case 'inactive':
-        return 'bg-gray-100 text-gray-800'
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
+  const handleStatusChange = (id: string, newStatus: 'active' | 'paused' | 'stopped') => {
+    setAdvertisers(prev => prev.map(advertiser => 
+      advertiser.id === id 
+        ? { ...advertiser, status: newStatus === 'stopped' ? 'inactive' : newStatus }
+        : advertiser
+    ))
+    
+    const statusMessages = {
+      active: 'Рекламодатель активирован',
+      paused: 'Рекламодатель приостановлен', 
+      stopped: 'Рекламодатель деактивирован'
     }
+    
+    success(statusMessages[newStatus])
   }
 
   return (
@@ -160,62 +164,7 @@ const AdvertisersListPage: React.FC = () => {
         </motion.button>
       </div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('advertiser.total_advertisers')}</p>
-              <p className="text-2xl font-bold text-gray-900">{advertisers.length}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('advertiser.total_budget')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                ${advertisers.reduce((sum, adv) => sum + adv.budget, 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('advertiser.total_spent')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                ${advertisers.reduce((sum, adv) => sum + adv.spent, 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-              <Eye className="w-5 h-5 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('advertiser.avg_ctr')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {(advertisers.reduce((sum, adv) => sum + adv.ctr, 0) / advertisers.length).toFixed(1)}%
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       {/* Advertisers List */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -242,9 +191,12 @@ const AdvertisersListPage: React.FC = () => {
                       <p className="text-sm text-gray-500">{advertiser.legalName}</p>
                     </div>
                     
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(advertiser.status)}`}>
-                      {t(`status.${advertiser.status}`)}
-                    </span>
+                    <StatusControl
+                      status={advertiser.status as any}
+                      onStatusChange={(newStatus) => handleStatusChange(advertiser.id, newStatus)}
+                      size="sm"
+                      showLabel={true}
+                    />
                   </div>
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">

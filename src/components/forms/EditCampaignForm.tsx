@@ -181,7 +181,7 @@ const EditCampaignForm: React.FC<EditCampaignFormProps> = ({
               <select
                 value={formData.platform}
                 onChange={(e) => handleInputChange('platform', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                className="glass-select"
               >
                 {platformOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -235,7 +235,7 @@ const EditCampaignForm: React.FC<EditCampaignFormProps> = ({
               <select
                 value={formData.status}
                 onChange={(e) => handleInputChange('status', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                className="glass-select"
               >
                 {statusOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -299,7 +299,7 @@ const EditCampaignForm: React.FC<EditCampaignFormProps> = ({
                   <select
                     value={formData.userFrequencyPeriod}
                     onChange={(e) => handleInputChange('userFrequencyPeriod', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="glass-select"
                   >
                     {periodOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -334,7 +334,7 @@ const EditCampaignForm: React.FC<EditCampaignFormProps> = ({
                   <select
                     value={formData.adFrequencyPeriod}
                     onChange={(e) => handleInputChange('adFrequencyPeriod', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="glass-select"
                   >
                     {periodOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -369,7 +369,7 @@ const EditCampaignForm: React.FC<EditCampaignFormProps> = ({
                   <select
                     value={formData.clickPeriod}
                     onChange={(e) => handleInputChange('clickPeriod', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="glass-select"
                   >
                     {periodOptions.map(option => (
                       <option key={option.value} value={option.value}>

@@ -47,10 +47,10 @@ const FraudDetectionPage: React.FC = () => {
         </div>
         
         <div className="flex items-center space-x-4">
-          <div className={`px-3 py-2 rounded-lg text-sm font-medium ${
-            alertLevel === 'high' ? 'bg-red-100 text-red-700' :
-            alertLevel === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-            'bg-emerald-100 text-emerald-700'
+          <div className={`px-3 py-2 rounded-lg text-sm font-medium border ${
+            alertLevel === 'high' ? 'status-rejected' :
+            alertLevel === 'medium' ? 'status-pending' :
+            'status-active'
           }`}>
             {t(`fraud.${alertLevel}`, alertLevel.toUpperCase())} RISK
           </div>
@@ -238,10 +238,10 @@ const FraudDetectionPage: React.FC = () => {
                       <p className="text-slate-500 text-sm">{region.percentage}% of fraud</p>
                     </div>
                   </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    region.risk === 'High' ? 'bg-red-100 text-red-700' :
-                    region.risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-emerald-100 text-emerald-700'
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                    region.risk === 'High' ? 'status-rejected' :
+                    region.risk === 'Medium' ? 'status-pending' :
+                    'status-active'
                   }`}>
                     {region.risk}
                   </span>
@@ -268,9 +268,9 @@ const FraudDetectionPage: React.FC = () => {
                 <div key={index} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <p className="text-slate-900 font-medium text-sm">{method.method}</p>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      method.status === 'Active' ? 'bg-emerald-100 text-emerald-700' :
-                      'bg-yellow-100 text-yellow-700'
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                      method.status === 'Active' ? 'status-active' :
+                      'status-pending'
                     }`}>
                       {method.status}
                     </span>
@@ -356,28 +356,28 @@ const FraudDetectionPage: React.FC = () => {
                     <td className="py-4 px-4 text-slate-700 font-mono text-sm">{log.ip}</td>
                     <td className="py-4 px-4 text-slate-700">{log.campaign}</td>
                     <td className="py-4 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        log.severity === 'High' ? 'bg-red-100 text-red-700' :
-                        log.severity === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-emerald-100 text-emerald-700'
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                        log.severity === 'High' ? 'status-rejected' :
+                        log.severity === 'Medium' ? 'status-pending' :
+                        'status-active'
                       }`}>
                         {log.severity}
                       </span>
                     </td>
                     <td className="py-4 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        log.action === 'Blocked' ? 'bg-red-100 text-red-700' :
-                        log.action === 'Flagged' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-slate-100 text-slate-700'
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                        log.action === 'Blocked' ? 'status-rejected' :
+                        log.action === 'Flagged' ? 'status-pending' :
+                        'status-inactive'
                       }`}>
                         {log.action}
                       </span>
                     </td>
                     <td className="py-4 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        log.status === 'Resolved' ? 'bg-emerald-100 text-emerald-700' :
-                        log.status === 'Monitoring' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-slate-100 text-slate-700'
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                        log.status === 'Resolved' ? 'status-completed' :
+                        log.status === 'Monitoring' ? 'status-pending' :
+                        'status-inactive'
                       }`}>
                         {log.status}
                       </span>

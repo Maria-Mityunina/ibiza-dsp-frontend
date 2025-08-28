@@ -19,7 +19,7 @@ import CreativesListPage from '@pages/creatives/CreativesListPage'
 import CreateCreativePage from '@pages/creatives/CreateCreativePage'
 import EditCreativePage from '@pages/creatives/EditCreativePage'
 import SegmentsPage from '@pages/segments/SegmentsPage'
-import AnalyticsPage from '@pages/analytics/AnalyticsPage'
+import DSPAnalyticsPage from '@pages/analytics/DSPAnalyticsPage'
 import FraudDetectionPage from '@pages/fraud-detection/FraudDetectionPage'
 import AudienceInsightsPage from '@pages/audience/AudienceInsightsPage'
 import CreativePerformancePage from '@pages/creative/CreativePerformancePage'
@@ -194,7 +194,7 @@ function App() {
           path="/analytics"
           element={
             <ProtectedRoute requiredPermissions={['view_analytics']}>
-              <AnalyticsPage />
+              <DSPAnalyticsPage />
             </ProtectedRoute>
           }
         />

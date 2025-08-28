@@ -511,18 +511,18 @@ const CreativePerformancePage: React.FC = () => {
                       <td className="py-4 px-4 text-slate-700">${asset.cpc}</td>
                       <td className="py-4 px-4 text-slate-700">{asset.conversions}</td>
                       <td className="py-4 px-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          asset.performance === 'high' ? 'bg-emerald-100 text-emerald-700' :
-                          asset.performance === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-red-100 text-red-700'
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                          asset.performance === 'high' ? 'status-active' :
+                          asset.performance === 'medium' ? 'status-pending' :
+                          'status-rejected'
                         }`}>
                           {asset.performance}
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          asset.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
-                          'bg-slate-100 text-slate-600'
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                          asset.status === 'active' ? 'status-active' :
+                          'status-inactive'
                         }`}>
                           {asset.status}
                         </span>

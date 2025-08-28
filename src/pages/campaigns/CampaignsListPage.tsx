@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Plus, Edit, Trash2, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer } from 'lucide-react'
+import { Plus, Edit, Trash2, Copy, Eye, TrendingUp, DollarSign, MousePointer } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
 import { CreateCampaignForm, EditCampaignForm } from '@components/forms'
+import { StatusControl, BudgetControl } from '@components/ui'
 
 interface Campaign {
   id: string
   name: string
-  status: 'active' | 'paused' | 'draft' | 'completed'
+  status: 'active' | 'paused' | 'draft' | 'completed' | 'pending' | 'stopped' | 'rejected'
   budget: number
   spent: number
   impressions: number
@@ -120,12 +121,30 @@ const CampaignsListPage: React.FC = () => {
     setShowEditForm(true)
   }
 
-  const toggleCampaignStatus = (id: string) => {
+  const handleStatusChange = (id: string, newStatus: 'active' | 'paused' | 'stopped') => {
     setCampaigns(prev => prev.map(campaign => 
       campaign.id === id 
-        ? { ...campaign, status: campaign.status === 'active' ? 'paused' : 'active' as any }
+        ? { ...campaign, status: newStatus }
         : campaign
     ))
+    
+    const statusMessages = {
+      active: 'Кампания запущена',
+      paused: 'Кампания приостановлена', 
+      stopped: 'Кампания остановлена'
+    }
+    
+    success(statusMessages[newStatus])
+  }
+
+  const handleBudgetChange = (id: string, newBudget: number) => {
+    setCampaigns(prev => prev.map(campaign => 
+      campaign.id === id 
+        ? { ...campaign, budget: newBudget }
+        : campaign
+    ))
+    
+    success(`Бюджет кампании обновлен: $${newBudget.toLocaleString()}`)
   }
 
   const copyCampaign = (campaign: Campaign) => {
@@ -143,24 +162,9 @@ const CampaignsListPage: React.FC = () => {
     success(t('campaign.copied_successfully'))
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800'
-      case 'paused':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'draft':
-        return 'bg-gray-100 text-gray-800'
-      case 'completed':
-        return 'bg-blue-100 text-blue-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
 
-  const getStatusIcon = (status: string) => {
-    return status === 'active' ? Pause : Play
-  }
+
+
 
   return (
     <motion.div 
@@ -189,72 +193,7 @@ const CampaignsListPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <motion.div 
-          className="bg-blue-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <Eye className="h-5 w-5 text-blue-600" />
-            </div>
-            <span className="text-sm text-gray-600">{t('metric.impressions')}</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {campaigns.reduce((sum, camp) => sum + camp.impressions, 0).toLocaleString()}
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="bg-green-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-green-100 rounded-xl">
-              <MousePointer className="h-5 w-5 text-green-600" />
-            </div>
-            <span className="text-sm text-gray-600">{t('metric.clicks')}</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {campaigns.reduce((sum, camp) => sum + camp.clicks, 0).toLocaleString()}
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="bg-purple-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-purple-100 rounded-xl">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
-            </div>
-            <span className="text-sm text-gray-600">{t('metric.ctr')}</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {(campaigns.reduce((sum, camp) => sum + camp.ctr, 0) / campaigns.length).toFixed(1)}%
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          className="bg-orange-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-orange-100 rounded-xl">
-              <DollarSign className="h-5 w-5 text-orange-600" />
-            </div>
-            <span className="text-sm text-gray-600">{t('metric.spend')}</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            ${campaigns.reduce((sum, camp) => sum + camp.spent, 0).toLocaleString()}
-          </div>
-        </motion.div>
-      </div>
+
 
       {/* Campaigns List Header */}
       <div className="mb-6">
@@ -268,8 +207,6 @@ const CampaignsListPage: React.FC = () => {
         
         <div className="divide-y divide-gray-200">
           {campaigns.map((campaign) => {
-            const StatusIcon = getStatusIcon(campaign.status)
-            
             return (
               <motion.div
                 key={campaign.id}
@@ -289,15 +226,25 @@ const CampaignsListPage: React.FC = () => {
                         </p>
                       </div>
                       
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(campaign.status)}`}>
-                        {t(`status.${campaign.status}`)}
-                      </span>
+                      <StatusControl
+                        status={campaign.status}
+                        onStatusChange={(newStatus) => handleStatusChange(campaign.id, newStatus)}
+                        size="sm"
+                        showLabel={true}
+                      />
                     </div>
                     
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-4">
                       <div>
                         <p className="text-xs text-gray-500">{t('form.budget')}</p>
-                        <p className="text-sm font-medium text-gray-900">${campaign.budget.toLocaleString()}</p>
+                        <BudgetControl
+                          budget={campaign.budget}
+                          spent={campaign.spent}
+                          onBudgetChange={(newBudget) => handleBudgetChange(campaign.id, newBudget)}
+                          size="sm"
+                          showProgress={true}
+                          warningThreshold={85}
+                        />
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">{t('metric.spend')}</p>
@@ -353,17 +300,7 @@ const CampaignsListPage: React.FC = () => {
                       <Trash2 className="w-4 h-4" />
                     </button>
                     
-                    <button
-                      onClick={() => toggleCampaignStatus(campaign.id)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        campaign.status === 'active' 
-                          ? 'text-yellow-600 hover:bg-yellow-100' 
-                          : 'text-green-600 hover:bg-green-100'
-                      }`}
-                      title={campaign.status === 'active' ? t('action.pause') : t('action.resume')}
-                    >
-                      <StatusIcon className="w-4 h-4" />
-                    </button>
+
                   </div>
                 </div>
               </motion.div>

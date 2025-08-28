@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { X, ChevronDown, Plus, Minus, Upload } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X, Plus, Minus, Check, Upload } from 'lucide-react'
+import TimeScheduler from '@components/ui/TimeScheduler'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
 
 interface CreateAdGroupFormProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: AdGroupFormData) => void
+  onSubmit: (data: any) => void
   advertiserName?: string
   advertiserBudget?: string
 }
@@ -16,10 +17,13 @@ interface AdGroupFormData {
   platform: string
   name: string
   budget: string
-  startDate: string
-  endDate: string
-  startTime: string
-  endTime: string
+  status: string
+  scheduleStart: string
+  scheduleEnd: string
+  timeStart: string
+  timeEnd: string
+  allDay: boolean
+  selectedDays: number[]
   userFrequencyLimit: string
   userFrequencyPeriod: string
   adFrequencyLimit: string
@@ -40,21 +44,22 @@ interface AdGroupFormData {
 const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
   isOpen,
   onClose,
-  onSubmit,
-  advertiserName = "ООО Зеленоглазое такси",
-  advertiserBudget = "1000$"
+  onSubmit
 }) => {
   const { t } = useLanguageStore()
   const { success, error } = useToast()
   
   const [formData, setFormData] = useState<AdGroupFormData>({
-    platform: 'rustore',
+    platform: '',
     name: '',
     budget: '',
-    startDate: '',
-    endDate: '',
-    startTime: 'ad_groups',
-    endTime: 'all_day',
+    status: '',
+    scheduleStart: '',
+    scheduleEnd: '',
+    timeStart: '00:00',
+    timeEnd: '23:59',
+    allDay: true,
+    selectedDays: [0, 1, 2, 3, 4, 5, 6],
     userFrequencyLimit: '',
     userFrequencyPeriod: 'day',
     adFrequencyLimit: '',
@@ -62,10 +67,10 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
     clickLimit: '',
     clickPeriod: 'day',
     segments: [],
-    phoneModel: 'any',
-    region: 'all_russia',
-    language: 'ru',
-    osVersion: 'any_version',
+    phoneModel: '',
+    region: '',
+    language: '',
+    osVersion: '',
     excludeAudience: false,
     excludeSegments: [],
     excludeRegions: [],
@@ -73,106 +78,90 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [showExcludeAudience, setShowExcludeAudience] = useState(false)
-  const [segmentFile, setSegmentFile] = useState<File | null>(null)
+  const [showSegmentUpload, setShowSegmentUpload] = useState(false)
 
   const platformOptions = [
     { value: 'rustore', label: 'RuStore' }
   ]
 
+  const statusOptions = [
+    { value: 'draft', label: 'Черновик' },
+    { value: 'pending', label: 'На модерации' },
+    { value: 'active', label: 'Активна' },
+    { value: 'paused', label: 'Пауза' },
+    { value: 'rejected', label: 'Отклонена' },
+    { value: 'completed', label: 'Завершена' }
+  ]
+
   const periodOptions = [
-    { value: 'day', label: t('time.day') },
-    { value: 'week', label: t('time.week') },
-    { value: 'month', label: t('time.month') },
-    { value: 'campaign', label: t('time.whole_campaign') }
+    { value: 'day', label: 'День' },
+    { value: 'week', label: 'Неделя' },
+    { value: 'month', label: 'Месяц' },
+    { value: 'campaign', label: 'Вся РК' }
   ]
 
   const segmentOptions = [
-    { value: 'add_new', label: t('form.add_new_segment') },
-    { value: 'young_adults', label: 'Молодежь 18-25' },
-    { value: 'middle_age', label: 'Средний возраст 26-40' },
-    { value: 'seniors', label: 'Старший возраст 40+' },
-    { value: 'gamers', label: 'Геймеры' },
-    { value: 'shoppers', label: 'Покупатели онлайн' },
-    { value: 'travelers', label: 'Путешественники' }
-  ]
-
-  const phoneModelOptions = [
-    { value: 'any', label: 'Любое устройство' },
-    { value: 'iphone', label: 'iPhone' },
-    { value: 'samsung', label: 'Samsung' },
-    { value: 'xiaomi', label: 'Xiaomi' },
-    { value: 'huawei', label: 'Huawei' },
-    { value: 'oppo', label: 'OPPO' }
+    'Сегмент1',
+    'Пол',
+    'Лифт',
+    'Модель телефона',
+    'Регион',
+    'Язык ОС',
+    'Версия ОС',
+    'Интерес'
   ]
 
   const regionOptions = [
-    { value: 'all_russia', label: 'Вся Россия' },
-    { value: 'moscow', label: t('region.moscow') },
-    { value: 'spb', label: t('region.spb') },
-    { value: 'ekaterinburg', label: t('region.ekaterinburg') },
-    { value: 'novosibirsk', label: 'Новосибирск' },
-    { value: 'kazan', label: 'Казань' }
+    'Москва',
+    'Санкт-Петербург',
+    'Екатеринбург',
+    'Новосибирск',
+    'Нижний Новгород'
+  ]
+
+  const phoneModelOptions = [
+    'iPhone',
+    'Samsung Galaxy',
+    'Xiaomi',
+    'Huawei',
+    'Honor',
+    'Realme'
   ]
 
   const languageOptions = [
-    { value: 'ru', label: t('language.russian') },
-    { value: 'en', label: t('language.english') },
-    { value: 'es', label: t('language.spanish') },
-    { value: 'de', label: 'Немецкий' },
-    { value: 'fr', label: 'Французский' }
+    'Русский',
+    'Английский',
+    'Немецкий',
+    'Французский'
   ]
 
   const osVersionOptions = [
-    { value: 'any_version', label: 'Любая версия ОС' },
-    { value: 'ios_17', label: 'iOS 17+' },
-    { value: 'ios_16', label: 'iOS 16+' },
-    { value: 'ios_15', label: 'iOS 15+' },
-    { value: 'android_14', label: 'Android 14+' },
-    { value: 'android_13', label: 'Android 13+' },
-    { value: 'android_12', label: 'Android 12+' }
+    'Android 10+',
+    'Android 11+',
+    'Android 12+',
+    'iOS 14+',
+    'iOS 15+'
   ]
 
-  const timeOptions = [
-    { value: 'ad_groups', label: t('form.ad_groups') },
-    { value: 'all_day', label: t('form.all_day') }
-  ]
+  const handleInputChange = (field: keyof AdGroupFormData, value: string | boolean | string[] | number[]) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
+  }
 
-  const validateForm = () => {
+
+
+  const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.name.trim()) newErrors.name = t('form.required_field')
-    else if (formData.name.length > 64) newErrors.name = 'Максимум 64 символа'
-    
-    if (!formData.budget.trim()) newErrors.budget = t('form.required_field')
-    else if (!/^\d+$/.test(formData.budget)) newErrors.budget = 'Только цифры'
-    else if (formData.budget.length > 7) newErrors.budget = 'Максимум 7 цифр'
-    
-    if (!formData.startDate.trim()) newErrors.startDate = t('form.required_field')
-    if (!formData.endDate.trim()) newErrors.endDate = t('form.required_field')
-    
-    // Validate date range
-    if (formData.startDate && formData.endDate) {
-      if (new Date(formData.startDate) >= new Date(formData.endDate)) {
-        newErrors.endDate = t('form.invalid_date_range')
-      }
+    if (!formData.platform) newErrors.platform = 'Выберите площадку размещения'
+    if (!formData.name.trim()) newErrors.name = 'Введите название группы объявлений'
+    if (!formData.budget.trim()) newErrors.budget = 'Введите бюджет'
+    else if (isNaN(Number(formData.budget)) || Number(formData.budget) <= 0) {
+      newErrors.budget = 'Введите корректную сумму'
     }
-
-    // Validate frequency limits
-    if (formData.userFrequencyLimit && (!/^\d+$/.test(formData.userFrequencyLimit) || formData.userFrequencyLimit.length > 8)) {
-      newErrors.userFrequencyLimit = 'Максимум 8 цифр'
-    }
-    if (formData.adFrequencyLimit && (!/^\d+$/.test(formData.adFrequencyLimit) || formData.adFrequencyLimit.length > 8)) {
-      newErrors.adFrequencyLimit = 'Максимум 8 цифр'
-    }
-    if (formData.clickLimit && (!/^\d+$/.test(formData.clickLimit) || formData.clickLimit.length > 8)) {
-      newErrors.clickLimit = 'Максимум 8 цифр'
-    }
-
-    // Validate description
-    if (formData.description && formData.description.length > 500) {
-      newErrors.description = 'Максимум 500 символов'
-    }
+    if (!formData.status) newErrors.status = 'Выберите статус'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -181,223 +170,196 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (validateForm()) {
-      onSubmit(formData)
-      success(t('adgroup.created_successfully'))
-      onClose()
-    } else {
-      error(t('form.validation_error'))
+    if (!validateForm()) return
+
+    const submissionData = {
+      ...formData
     }
+
+    onSubmit(submissionData)
+    success('Группа объявлений создана успешно')
+    onClose()
   }
 
-  const handleInputChange = (field: keyof AdGroupFormData, value: string | boolean | string[]) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }))
-    }
-  }
-
-  const handleSegmentChange = (value: string) => {
-    if (value === 'add_new') {
-      // Open file upload dialog
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.accept = '.csv,.txt'
-      input.onchange = (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0]
-        if (file) {
-          setSegmentFile(file)
-          success(t('form.segment_uploaded'))
-        }
-      }
-      input.click()
-    } else {
-      const segments = formData.segments.includes(value)
-        ? formData.segments.filter(s => s !== value)
-        : [...formData.segments, value]
-      handleInputChange('segments', segments)
-    }
-  }
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setSegmentFile(file)
-      success(t('form.segment_uploaded'))
-    }
+  const handleSegmentUpload = () => {
+    success('Функция загрузки сегментов будет реализована после интеграции с API')
+    setShowSegmentUpload(false)
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
-      >
-        {/* Simple Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">{t('adgroup.create_new')}</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+    <AnimatePresence>
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Создать группу объявлений
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Площадка размещения */}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+            <div className="space-y-6">
+              
+              {/* Platform */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('form.platform')}
+                  Площадка размещения *
                 </label>
-                <div className="relative">
-                  <select
-                    value={formData.platform}
-                    onChange={(e) => handleInputChange('platform', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
-                  >
-
-                    {platformOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                </div>
+                <select
+                  value={formData.platform}
+                  onChange={(e) => handleInputChange('platform', e.target.value)}
+                  className={`glass-select ${errors.platform ? 'error' : ''}`}
+                >
+                  <option value="">Выберите площадку</option>
+                  {platformOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.platform && (
+                  <p className="mt-1 text-sm text-red-500">{errors.platform}</p>
+                )}
               </div>
 
-              {/* Название РК */}
+              {/* Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('form.adgroup_name')} *
+                  Название группы объявлений *
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
-                    errors.name ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={t('form.enter_adgroup_name')}
                   maxLength={64}
+                  className={`glass-input ${errors.name ? 'error' : ''}`}
+                  placeholder="Введите название"
                 />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                )}
               </div>
 
-              {/* Бюджет */}
+              {/* Budget */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('form.budget')} *
+                  Бюджет *
                 </label>
                 <input
                   type="text"
                   value={formData.budget}
                   onChange={(e) => handleInputChange('budget', e.target.value.replace(/\D/g, ''))}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
-                    errors.budget ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="0"
                   maxLength={7}
+                  className={`glass-input ${errors.budget ? 'error' : ''}`}
+                  placeholder="Введите бюджет"
                 />
-                {errors.budget && <p className="text-red-500 text-sm mt-1">{errors.budget}</p>}
+                {errors.budget && (
+                  <p className="mt-1 text-sm text-red-500">{errors.budget}</p>
+                )}
               </div>
 
-              {/* Даты показа */}
-              <div className="lg:col-span-2">
+              {/* Status */}
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('form.show_dates')} *
+                  Статус *
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  className={`glass-select ${errors.status ? 'error' : ''}`}
+                >
+                  <option value="">Выберите статус</option>
+                  {statusOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.status && (
+                  <p className="mt-1 text-sm text-red-500">{errors.status}</p>
+                )}
+              </div>
+
+              {/* Schedule */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Интервал проведения РК
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">{t('form.from')}</label>
+                    <label className="block text-xs text-gray-500 mb-1">с</label>
                     <input
                       type="date"
-                      value={formData.startDate}
-                      onChange={(e) => handleInputChange('startDate', e.target.value)}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
-                        errors.startDate ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      value={formData.scheduleStart}
+                      onChange={(e) => handleInputChange('scheduleStart', e.target.value)}
+                      className="glass-select"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">{t('form.to')}</label>
+                    <label className="block text-xs text-gray-500 mb-1">до</label>
                     <input
                       type="date"
-                      value={formData.endDate}
-                      onChange={(e) => handleInputChange('endDate', e.target.value)}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent ${
-                        errors.endDate ? 'border-red-500' : 'border-gray-300'
-                      }`}
+                      value={formData.scheduleEnd}
+                      onChange={(e) => handleInputChange('scheduleEnd', e.target.value)}
+                      className="glass-select"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Время показа */}
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('form.show_time')}
-                </label>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">{t('form.from')}</label>
-                    <select
-                      value={formData.startTime}
-                      onChange={(e) => handleInputChange('startTime', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
-                    >
-                      {timeOptions.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">{t('form.to')}</label>
-                    <select
-                      value={formData.endTime}
-                      onChange={(e) => handleInputChange('endTime', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
-                    >
-                      {timeOptions.map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+              {/* Time Schedule */}
+              <div>
+                <TimeScheduler
+                  startTime={formData.timeStart}
+                  endTime={formData.timeEnd}
+                  selectedDays={formData.selectedDays}
+                  allDay={formData.allDay}
+                  onTimeChange={(startTime, endTime) => {
+                    handleInputChange('timeStart', startTime)
+                    handleInputChange('timeEnd', endTime)
+                  }}
+                  onDaysChange={(days) => handleInputChange('selectedDays', days)}
+                  onAllDayChange={(allDay) => handleInputChange('allDay', allDay)}
+                />
               </div>
 
               {/* Frequency Limits */}
-              <div className="lg:col-span-2 space-y-4">
-                {/* Лимит показов на пользователя */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* User Frequency */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('form.user_frequency_limit')}
+                    Лимит показов на пользователя
                   </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      value={formData.userFrequencyLimit}
-                      onChange={(e) => handleInputChange('userFrequencyLimit', e.target.value.replace(/\D/g, ''))}
-                      className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                      placeholder={t('form.shows')}
-                    />
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <span className="text-sm text-gray-600 mt-3">Показ</span>
+                      <input
+                        type="text"
+                        value={formData.userFrequencyLimit}
+                        onChange={(e) => handleInputChange('userFrequencyLimit', e.target.value.replace(/\D/g, ''))}
+                        className="flex-1 glass-input"
+                        placeholder="0"
+                      />
+                    </div>
                     <select
                       value={formData.userFrequencyPeriod}
                       onChange={(e) => handleInputChange('userFrequencyPeriod', e.target.value)}
-                      className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
+                      className="w-full glass-select"
                     >
-
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -407,25 +369,27 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                   </div>
                 </div>
 
-                {/* Лимит показов объявления */}
+                {/* Ad Frequency */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('form.ad_frequency_limit')}
+                    Лимит показов объявления
                   </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      value={formData.adFrequencyLimit}
-                      onChange={(e) => handleInputChange('adFrequencyLimit', e.target.value.replace(/\D/g, ''))}
-                      className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                      placeholder={t('form.shows')}
-                    />
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <span className="text-sm text-gray-600 mt-3">Показ</span>
+                      <input
+                        type="text"
+                        value={formData.adFrequencyLimit}
+                        onChange={(e) => handleInputChange('adFrequencyLimit', e.target.value.replace(/\D/g, ''))}
+                        className="flex-1 glass-input"
+                        placeholder="0"
+                      />
+                    </div>
                     <select
                       value={formData.adFrequencyPeriod}
                       onChange={(e) => handleInputChange('adFrequencyPeriod', e.target.value)}
-                      className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
+                      className="w-full glass-select"
                     >
-
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -435,25 +399,27 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                   </div>
                 </div>
 
-                {/* Лимит переходов */}
+                {/* Click Limit */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('form.click_limit')}
+                    Лимит переходов
                   </label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      value={formData.clickLimit}
-                      onChange={(e) => handleInputChange('clickLimit', e.target.value.replace(/\D/g, ''))}
-                      className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                      placeholder={t('form.shows')}
-                    />
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <span className="text-sm text-gray-600 mt-3">Показ</span>
+                      <input
+                        type="text"
+                        value={formData.clickLimit}
+                        onChange={(e) => handleInputChange('clickLimit', e.target.value.replace(/\D/g, ''))}
+                        className="flex-1 glass-input"
+                        placeholder="0"
+                      />
+                    </div>
                     <select
                       value={formData.clickPeriod}
                       onChange={(e) => handleInputChange('clickPeriod', e.target.value)}
-                      className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
+                      className="w-full glass-select"
                     >
-
                       {periodOptions.map(option => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -464,206 +430,267 @@ const CreateAdGroupForm: React.FC<CreateAdGroupFormProps> = ({
                 </div>
               </div>
 
-              {/* Готовый сегмент */}
+              {/* Targeting */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900">Таргетинг</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Segments */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Готовый сегмент
+                    </label>
+                    <select
+                      multiple
+                      value={formData.segments}
+                      onChange={(e) => {
+                        const values = Array.from(e.target.selectedOptions, option => option.value)
+                        handleInputChange('segments', values)
+                      }}
+                      className="glass-select"
+                      size={4}
+                    >
+                      {segmentOptions.map(segment => (
+                        <option key={segment} value={segment}>
+                          {segment}
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => setShowSegmentUpload(true)}
+                      className="mt-2 text-sm text-slate-600 hover:text-slate-800 underline"
+                    >
+                      Добавить новый сегмент
+                    </button>
+                  </div>
+
+                  {/* Region */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Регион
+                    </label>
+                    <select
+                      value={formData.region}
+                      onChange={(e) => handleInputChange('region', e.target.value)}
+                      className="glass-select"
+                    >
+                      <option value="">Выберите регион</option>
+                      {regionOptions.map(region => (
+                        <option key={region} value={region}>
+                          {region}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Phone Model */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Модель телефона
+                    </label>
+                    <select
+                      value={formData.phoneModel}
+                      onChange={(e) => handleInputChange('phoneModel', e.target.value)}
+                      className="glass-select"
+                    >
+                      <option value="">Выберите модель</option>
+                      {phoneModelOptions.map(model => (
+                        <option key={model} value={model}>
+                          {model}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Language */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Язык ОС
+                    </label>
+                    <select
+                      value={formData.language}
+                      onChange={(e) => handleInputChange('language', e.target.value)}
+                      className="glass-select"
+                    >
+                      <option value="">Выберите язык</option>
+                      {languageOptions.map(language => (
+                        <option key={language} value={language}>
+                          {language}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* OS Version */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Версия ОС
+                    </label>
+                    <select
+                      value={formData.osVersion}
+                      onChange={(e) => handleInputChange('osVersion', e.target.value)}
+                      className="glass-select"
+                    >
+                      <option value="">Выберите версию</option>
+                      {osVersionOptions.map(version => (
+                        <option key={version} value={version}>
+                          {version}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Exclude Audience */}
+              <div className="border-t pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Исключить аудиторию
+                  </h3>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.excludeAudience}
+                      onChange={(e) => handleInputChange('excludeAudience', e.target.checked)}
+                      className="w-5 h-5 text-slate-600 rounded border-gray-300 focus:ring-slate-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">Включить исключения</span>
+                  </label>
+                </div>
+
+                {formData.excludeAudience && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                  >
+                    {/* Exclude Segments */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Исключить сегменты
+                      </label>
+                      <select
+                        multiple
+                        value={formData.excludeSegments}
+                        onChange={(e) => {
+                          const values = Array.from(e.target.selectedOptions, option => option.value)
+                          handleInputChange('excludeSegments', values)
+                        }}
+                        className="glass-select"
+                        size={4}
+                      >
+                        {segmentOptions.map(segment => (
+                          <option key={segment} value={segment}>
+                            {segment}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Exclude Regions */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Исключить регионы
+                      </label>
+                      <select
+                        multiple
+                        value={formData.excludeRegions}
+                        onChange={(e) => {
+                          const values = Array.from(e.target.selectedOptions, option => option.value)
+                          handleInputChange('excludeRegions', values)
+                        }}
+                        className="glass-select"
+                        size={4}
+                      >
+                        {regionOptions.map(region => (
+                          <option key={region} value={region}>
+                            {region}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('form.ready_segment')}
+                  Описание
                 </label>
-                <div className="space-y-2">
-                  {segmentOptions.map(option => (
-                    <label key={option.value} className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        checked={option.value === 'add_new' ? !!segmentFile : formData.segments.includes(option.value)}
-                        onChange={() => handleSegmentChange(option.value)}
-                        className="w-4 h-4 text-slate-600 border-gray-300 rounded focus:ring-slate-500"
-                      />
-                      <span className="text-sm text-gray-700">{option.label}</span>
-                      {option.value === 'add_new' && (
-                        <input
-                          type="file"
-                          accept=".csv,.txt"
-                          onChange={handleFileUpload}
-                          className="hidden"
-                          id="segment-upload"
-                        />
-                      )}
-                    </label>
-                  ))}
-                  {segmentFile && (
-                    <p className="text-sm text-green-600">
-                      {t('form.file_uploaded')}: {segmentFile.name}
-                    </p>
-                  )}
-                </div>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  rows={4}
+                  className="w-full glass-textarea"
+                  placeholder="Введите описание группы объявлений"
+                />
               </div>
-
-              {/* Targeting Options */}
-              <div className="space-y-4">
-                {/* Модель телефона */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('form.phone_model')}
-                  </label>
-                  <select
-                    value={formData.phoneModel}
-                    onChange={(e) => handleInputChange('phoneModel', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
-                  >
-                    {phoneModelOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Регион */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('form.region')}
-                  </label>
-                  <select
-                    value={formData.region}
-                    onChange={(e) => handleInputChange('region', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
-                  >
-                    {regionOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Язык ОС */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('form.os_language')}
-                  </label>
-                  <select
-                    value={formData.language}
-                    onChange={(e) => handleInputChange('language', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
-                  >
-                    {languageOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Версия ОС */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('form.os_version')}
-                  </label>
-                  <select
-                    value={formData.osVersion}
-                    onChange={(e) => handleInputChange('osVersion', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent appearance-none bg-white"
-                  >
-                    {osVersionOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Исключить аудиторию */}
-            <div className="border border-gray-200 rounded-lg">
-              <button
-                type="button"
-                onClick={() => setShowExcludeAudience(!showExcludeAudience)}
-                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
-              >
-                <span className="text-sm font-medium text-gray-700">{t('form.exclude_audience')}</span>
-                {showExcludeAudience ? (
-                  <Minus className="w-4 h-4 text-gray-400" />
-                ) : (
-                  <Plus className="w-4 h-4 text-gray-400" />
-                )}
-              </button>
-              
-              {showExcludeAudience && (
-                <div className="border-t border-gray-200 p-4 space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('form.exclude_segments')}
-                    </label>
-                    <select
-                      multiple
-                      value={formData.excludeSegments}
-                      onChange={(e) => handleInputChange('excludeSegments', Array.from(e.target.selectedOptions, option => option.value))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                    >
-                      {segmentOptions.filter(opt => opt.value !== 'add_new').map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {t('form.exclude_regions')}
-                    </label>
-                    <select
-                      multiple
-                      value={formData.excludeRegions}
-                      onChange={(e) => handleInputChange('excludeRegions', Array.from(e.target.selectedOptions, option => option.value))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                    >
-                      {regionOptions.filter(opt => opt.value !== '').map(option => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Описание */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('form.description')}
-              </label>
-              <textarea
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder={t('form.enter_description')}
-                rows={4}
-                maxLength={500}
-              />
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+            <div className="flex items-center justify-end gap-4 pt-6 mt-6 border-t border-gray-200">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
               >
-                {t('action.cancel')}
+                Отменить
               </button>
               <button
                 type="submit"
-                className="px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium"
               >
-                {t('action.save')}
+                <Check className="w-5 h-5" />
+                Сохранить
               </button>
             </div>
-        </form>
-      </motion.div>
-    </div>
+          </form>
+
+          {/* Segment Upload Modal */}
+          <AnimatePresence>
+            {showSegmentUpload && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4"
+                >
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                    Добавить новый сегмент
+                  </h3>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-sm text-gray-600">
+                      Перетащите файл сюда или нажмите для выбора
+                    </p>
+                  </div>
+                  <div className="flex gap-3 mt-6">
+                    <button
+                      type="button"
+                      onClick={handleSegmentUpload}
+                      className="flex-1 px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition-colors"
+                    >
+                      Сохранить
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowSegmentUpload(false)}
+                      className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors"
+                    >
+                      Отмена
+                    </button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </div>
+    </AnimatePresence>
   )
 }
 

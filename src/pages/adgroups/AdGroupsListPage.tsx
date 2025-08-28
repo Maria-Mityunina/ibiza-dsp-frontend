@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Plus, Edit, Trash2, Play, Pause, Copy, Eye, TrendingUp, DollarSign, MousePointer, Target } from 'lucide-react'
+import { Plus, Edit, Trash2, Copy, Eye, TrendingUp, DollarSign, MousePointer, Target } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
 import { CreateAdGroupForm, EditAdGroupForm } from '@components/forms'
+import { StatusControl, BudgetControl } from '@components/ui'
 
 interface AdGroup {
   id: string
   name: string
-  status: 'active' | 'paused' | 'draft'
+  status: 'active' | 'paused' | 'draft' | 'completed' | 'pending' | 'stopped' | 'rejected'
   budget: number
   spent: number
   impressions: number
@@ -113,12 +114,30 @@ const AdGroupsListPage: React.FC = () => {
     setShowEditForm(true)
   }
 
-  const toggleAdGroupStatus = (id: string) => {
+  const handleStatusChange = (id: string, newStatus: 'active' | 'paused' | 'stopped') => {
     setAdGroups(prev => prev.map(adGroup => 
       adGroup.id === id 
-        ? { ...adGroup, status: adGroup.status === 'active' ? 'paused' : 'active' as any }
+        ? { ...adGroup, status: newStatus }
         : adGroup
     ))
+    
+    const statusMessages = {
+      active: 'Группа объявлений запущена',
+      paused: 'Группа объявлений приостановлена', 
+      stopped: 'Группа объявлений остановлена'
+    }
+    
+    success(statusMessages[newStatus])
+  }
+
+  const handleBudgetChange = (id: string, newBudget: number) => {
+    setAdGroups(prev => prev.map(adGroup => 
+      adGroup.id === id 
+        ? { ...adGroup, budget: newBudget }
+        : adGroup
+    ))
+    
+    success(`Бюджет группы объявлений обновлен: $${newBudget.toLocaleString()}`)
   }
 
   const copyAdGroup = (adGroup: AdGroup) => {
@@ -136,22 +155,7 @@ const AdGroupsListPage: React.FC = () => {
     success(t('adgroup.copied_successfully'))
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800'
-      case 'paused':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'draft':
-        return 'bg-gray-100 text-gray-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
-  }
 
-  const getStatusIcon = (status: string) => {
-    return status === 'active' ? Pause : Play
-  }
 
   return (
     <motion.div 
@@ -180,68 +184,7 @@ const AdGroupsListPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <motion.div 
-          className="bg-blue-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <Target className="h-5 w-5 text-blue-600" />
-            </div>
-            <span className="text-sm text-gray-600">Всего групп</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {adGroups.length}
-          </div>
-        </motion.div>
-        
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <MousePointer className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.clicks')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {adGroups.reduce((sum, group) => sum + group.clicks, 0).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{t('metric.ctr')}</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {(adGroups.reduce((sum, group) => sum + group.ctr, 0) / adGroups.length).toFixed(1)}%
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <motion.div 
-          className="bg-orange-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-orange-100 rounded-xl">
-              <DollarSign className="h-5 w-5 text-orange-600" />
-            </div>
-            <span className="text-sm text-gray-600">Потрачено</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            ${adGroups.reduce((sum, group) => sum + group.spent, 0).toLocaleString()}
-          </div>
-        </motion.div>
-      </div>
+
 
       {/* Ad Groups List Header */}
       <div className="mb-6">
@@ -253,10 +196,8 @@ const AdGroupsListPage: React.FC = () => {
       {/* Ad Groups List */}
       <div className="space-y-4">
         
-        <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-gray-200">
           {adGroups.map((adGroup) => {
-            const StatusIcon = getStatusIcon(adGroup.status)
-            
             return (
               <motion.div
                 key={adGroup.id}
@@ -274,15 +215,25 @@ const AdGroupsListPage: React.FC = () => {
                         <p className="text-sm text-gray-500">{adGroup.targeting}</p>
                       </div>
                       
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(adGroup.status)}`}>
-                        {t(`status.${adGroup.status}`)}
-                      </span>
+                      <StatusControl
+                        status={adGroup.status}
+                        onStatusChange={(newStatus) => handleStatusChange(adGroup.id, newStatus)}
+                        size="sm"
+                        showLabel={true}
+                      />
                     </div>
                     
                     <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-4">
                       <div>
                         <p className="text-xs text-gray-500">{t('form.budget')}</p>
-                        <p className="text-sm font-medium text-gray-900">${adGroup.budget.toLocaleString()}</p>
+                        <BudgetControl
+                          budget={adGroup.budget}
+                          spent={adGroup.spent}
+                          onBudgetChange={(newBudget) => handleBudgetChange(adGroup.id, newBudget)}
+                          size="sm"
+                          showProgress={true}
+                          warningThreshold={85}
+                        />
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">{t('metric.spend')}</p>
@@ -338,17 +289,7 @@ const AdGroupsListPage: React.FC = () => {
                       <Trash2 className="w-4 h-4" />
                     </button>
                     
-                    <button
-                      onClick={() => toggleAdGroupStatus(adGroup.id)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        adGroup.status === 'active' 
-                          ? 'text-yellow-600 hover:bg-yellow-100' 
-                          : 'text-green-600 hover:bg-green-100'
-                      }`}
-                      title={adGroup.status === 'active' ? t('action.pause') : t('action.resume')}
-                    >
-                      <StatusIcon className="w-4 h-4" />
-                    </button>
+
                   </div>
                 </div>
               </motion.div>

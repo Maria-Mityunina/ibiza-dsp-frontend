@@ -98,11 +98,11 @@ const LiveMetricsChart: React.FC<LiveMetricsChartProps> = ({ title, className = 
   }
 
   return (
-    <div className={`bg-slate-900 rounded-2xl p-6 shadow-sm text-white ${className}`}>
+    <div className={`bg-gradient-to-r from-gray-900 via-black to-gray-900 rounded-xl p-4 sm:p-6 shadow-lg text-white ${className}`}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-white text-lg font-medium">{title}</h3>
         <div className="flex items-center space-x-3">
-          <div className={`w-3 h-3 rounded-full ${isLive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}></div>
+          <div className={`w-3 h-3 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-gray-500'}`}></div>
           <button
             onClick={() => setIsLive(!isLive)}
             className="text-sm text-slate-300 hover:text-white transition-colors"
@@ -116,7 +116,7 @@ const LiveMetricsChart: React.FC<LiveMetricsChartProps> = ({ title, className = 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Impressions */}
           <motion.div 
-            className="bg-slate-800 rounded-lg p-4"
+            className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:bg-white/15 transition-all duration-300"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3 }}
@@ -142,7 +142,7 @@ const LiveMetricsChart: React.FC<LiveMetricsChartProps> = ({ title, className = 
 
           {/* Clicks */}
           <motion.div 
-            className="bg-slate-800 rounded-lg p-4"
+            className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:bg-white/15 transition-all duration-300"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.1 }}
@@ -168,7 +168,7 @@ const LiveMetricsChart: React.FC<LiveMetricsChartProps> = ({ title, className = 
 
           {/* CTR */}
           <motion.div 
-            className="bg-slate-800 rounded-lg p-4"
+            className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:bg-white/15 transition-all duration-300"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.2 }}
@@ -194,7 +194,7 @@ const LiveMetricsChart: React.FC<LiveMetricsChartProps> = ({ title, className = 
 
           {/* Spend */}
           <motion.div 
-            className="bg-slate-800 rounded-lg p-4"
+            className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:bg-white/15 transition-all duration-300"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}

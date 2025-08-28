@@ -1,692 +1,1014 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
+import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLanguageStore } from '@stores/languageStore'
-import { useFilters } from '@hooks/useFilters'
-import { useExport } from '@hooks/useExport'
 import { useToast } from '@hooks/useToast'
 import { 
-  Users, 
+  BarChart3, 
+  TrendingUp, 
+  TrendingDown, 
   Eye, 
   MousePointer, 
-  TrendingUp, 
-  DollarSign,
-  Target,
-  BarChart3,
-  Activity,
-  Zap,
-  Award,
-  Percent,
+  DollarSign, 
+  Target, 
+  Users, 
+  Activity, 
   Clock,
-  MoreHorizontal,
-  Globe,
-  Shield,
-  Smartphone,
-  Monitor,
-  Tablet,
-  AlertTriangle,
-  TrendingDown,
-  Play,
-  Pause,
+  Award,
+  RefreshCw,
   Settings,
-  Calendar,
-  Filter,
   Download,
-  RefreshCw
+  Calendar,
+  ChevronDown,
+  MoreVertical,
+  Star,
+  CheckCircle,
+  Edit,
+  Chrome,
+  Wifi,
+  Database,
+  Server,
+  Laptop,
+  Package,
+  ShoppingBag,
+  CreditCard
 } from 'lucide-react'
 
-// Import components
-import RadarChart from '@components/charts/RadarChart'
-import HeatmapCalendar from '@components/charts/HeatmapCalendar'
-import { InteractiveFunnelChart, LiveMetricsChart, ScatterPlotChart } from '@components/charts'
-import TeamCard from '@components/ui/TeamCard'
-import { addDays } from 'date-fns'
+import { PageHeader } from '@components/layout'
+import { useExport } from '@hooks/useExport'
+
+// Types
+interface KPICard {
+  id: string
+  title: string
+  value: string | number
+  change: number
+  trend: 'up' | 'down' | 'stable'
+  icon: React.ComponentType<any>
+  chartData: number[]
+}
+
+interface TodoItem {
+  id: string
+  title: string
+  completed: boolean
+  priority: 'high' | 'medium' | 'low'
+  dueDate: string
+}
+
+interface Transaction {
+  id: string
+  type: 'income' | 'expense'
+  description: string
+  amount: number
+  date: string
+  icon: string
+  color: string
+}
 
 const AnalyticsPage: React.FC = () => {
   const { t } = useLanguageStore()
-  const { filters, updateFilter } = useFilters()
+  const { success, error, info, warning } = useToast()
   const { exportData, isExporting } = useExport()
-  const { success, error } = useToast()
-  const [isRealTimeActive, setIsRealTimeActive] = useState(true)
-  const [selectedTab, setSelectedTab] = useState('analytics')
 
-  // DSP Performance Data
-  const performanceRadarData = [
-    { subject: 'CTR', value: 85, fullMark: 100 },
-    { subject: 'ROAS', value: 92, fullMark: 100 },
-    { subject: 'Quality', value: 78, fullMark: 100 },
-    { subject: 'Reach', value: 88, fullMark: 100 },
-    { subject: 'Frequency', value: 95, fullMark: 100 },
-    { subject: 'Viewability', value: 82, fullMark: 100 },
+  // KPI Data
+  const [kpiData] = useState<KPICard[]>([
+    {
+      id: 'followers',
+      title: 'Total Followers',
+      value: 12432,
+      change: 0.892,
+      trend: 'up',
+      icon: Users,
+      chartData: [30, 45, 35, 50, 40, 60, 45, 55]
+    },
+    {
+      id: 'bounce',
+      title: 'Bounce Rate',
+      value: 12432,
+      change: 0.892,
+      trend: 'up',
+      icon: TrendingUp,
+      chartData: [20, 35, 25, 40, 30, 50, 35, 45]
+    },
+    {
+      id: 'conversion',
+      title: 'Conversion Rate',
+      value: 12432,
+      change: 0.892,
+      trend: 'up',
+      icon: Target,
+      chartData: [40, 25, 45, 30, 50, 35, 60, 40]
+    },
+    {
+      id: 'session',
+      title: 'Session Duration',
+      value: '3hrs',
+      change: 0.892,
+      trend: 'up',
+      icon: Clock,
+      chartData: [35, 50, 30, 60, 40, 55, 30, 65]
+    }
+  ])
+
+  // Browser Data
+  const browserData = [
+    { name: 'Chrome', sessions: 23379, change: 5.37, color: '#4A5568' },
+    { name: 'Safari', sessions: 20937, change: 1.74, color: '#718096' },
+    { name: 'Opera', sessions: 20848, change: -11.43, color: '#A0AEC0' },
+    { name: 'Firefox', sessions: 18120, change: 7.61, color: '#CBD5E0' },
+    { name: 'Edge', sessions: 14986, change: -1.14, color: '#E2E8F0' }
   ]
 
-  // Team members (targeting managers)
-  const teamMembers = [
-    { id: '1', name: 'Alex Chen', initials: 'AC', status: 'online' as const, role: 'Campaign Manager' },
-    { id: '2', name: 'Sarah Wilson', initials: 'SW', status: 'online' as const, role: 'Data Analyst' },
-    { id: '3', name: 'Mike Johnson', initials: 'MJ', status: 'away' as const, role: 'DSP Specialist' },
-    { id: '4', name: 'Emma Davis', initials: 'ED', status: 'online' as const, role: 'Trader' },
-    { id: '5', name: 'Tom Brown', initials: 'TB', status: 'offline' as const, role: 'QA Analyst' },
+  // Countries Data
+  const countriesData = [
+    { name: 'United States', visitors: 32190, flag: '🇺🇸' },
+    { name: 'Argentina', visitors: 8798, flag: '🇦🇷' },
+    { name: 'Canada', visitors: 16885, flag: '🇨🇦' },
+    { name: 'India', visitors: 14885, flag: '🇮🇳' },
+    { name: 'Italy', visitors: 17578, flag: '🇮🇹' },
+    { name: 'Germany', visitors: 10118, flag: '🇩🇪' }
   ]
 
-  // Real-time bid data
-  const realtimeBids = [
-    { timestamp: new Date(), bids: 1250, wins: 89, price: 2.45 },
-    { timestamp: new Date(), bids: 1180, wins: 76, price: 2.32 },
-    { timestamp: new Date(), bids: 1340, wins: 95, price: 2.67 },
+  // Monthly Chart Data
+  const monthlyData = [
+    { month: 'Jan', orders: 32, sales: 31, profit: 38 },
+    { month: 'Feb', orders: 20, sales: 35, profit: 42 },
+    { month: 'Mar', orders: 31, sales: 37, profit: 35 },
+    { month: 'Apr', orders: 37, sales: 30, profit: 48 },
+    { month: 'May', orders: 23, sales: 45, profit: 40 },
+    { month: 'Jun', orders: 31, sales: 47, profit: 52 },
+    { month: 'Jul', orders: 45, sales: 29, profit: 45 },
+    { month: 'Aug', orders: 30, sales: 30, profit: 38 },
+    { month: 'Sep', orders: 54, sales: 32, profit: 45 },
+    { month: 'Oct', orders: 31, sales: 20, profit: 52 },
+    { month: 'Nov', orders: 18, sales: 37, profit: 42 },
+    { month: 'Dec', orders: 37, sales: 35, profit: 48 }
   ]
+
+  // Activity Data
+  const activityData = [
+    { label: 'Total Visits', value: 23124, change: 1.75, trend: 'up' },
+    { label: 'Total Products', value: '1.3k', change: -0.85, trend: 'down' },
+    { label: 'Total Sales', value: '23.89k', change: 3.74, trend: 'up' },
+    { label: 'Total Revenue', value: '$187.38k', change: 0.23, trend: 'up' },
+    { label: 'Total Profit', value: '$84.33k', change: -4.95, trend: 'down' },
+    { label: 'Total Income', value: '$983k', change: 1.75, trend: 'up' }
+  ]
+
+  // Todo Items
+  const [todoItems, setTodoItems] = useState<TodoItem[]>([
+    { id: '1', title: 'Finish Presentation Slides', completed: false, priority: 'high', dueDate: 'May 29, 2024' },
+    { id: '2', title: 'Send Follow-up Emails', completed: false, priority: 'medium', dueDate: 'May 27, 2024' },
+    { id: '3', title: 'Research New Software', completed: false, priority: 'low', dueDate: 'May 30, 2024' },
+    { id: '4', title: 'Schedule Training Session', completed: false, priority: 'medium', dueDate: 'May 29, 2024' },
+    { id: '5', title: 'Update Task Board', completed: true, priority: 'low', dueDate: 'May 27, 2024' }
+  ])
+
+  // Transactions
+  const transactionsData: Transaction[] = [
+    { id: '1', type: 'expense', description: 'Swift Ads', amount: 500, date: 'May 25, 2024', icon: 'S', color: '#EF4444' },
+    { id: '2', type: 'expense', description: 'Eco Build', amount: 200, date: 'May 24, 2024', icon: 'E', color: '#F97316' },
+    { id: '3', type: 'income', description: 'Health Track', amount: 1000, date: 'May 23, 2024', icon: 'H', color: '#10B981' },
+    { id: '4', type: 'expense', description: 'Solar Grid', amount: 300, date: 'May 22, 2024', icon: 'S', color: '#3B82F6' },
+    { id: '5', type: 'income', description: 'Data Stream', amount: 700, date: 'May 19, 2024', icon: 'D', color: '#8B5CF6' }
+  ]
+
+  // Helper Functions
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`
+    return num.toLocaleString()
+  }
+
+  const formatCurrency = (num: number): string => {
+    return new Intl.NumberFormat('ru-RU', { 
+      style: 'currency', 
+      currency: 'RUB',
+      maximumFractionDigits: 0
+    }).format(num)
+  }
+
+  const getTrendIcon = (trend: string) => {
+    if (trend === 'up') return <TrendingUp className="w-3 h-3 text-green-600" />
+    if (trend === 'down') return <TrendingDown className="w-3 h-3 text-red-500" />
+    return null
+  }
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'text-red-600 bg-red-50 border-red-200'
+      case 'medium': return 'text-amber-600 bg-amber-50 border-amber-200'
+      case 'low': return 'text-green-600 bg-green-50 border-green-200'
+      default: return 'text-gray-500 bg-gray-50 border-gray-200'
+    }
+  }
+
+  // Event Handlers
+  const handleTodoToggle = (id: string) => {
+    setTodoItems(prev => prev.map(item => 
+      item.id === id ? { ...item, completed: !item.completed } : item
+    ))
+    success('Задача обновлена')
+  }
+
+  const handleExport = async (format: 'csv' | 'xlsx' | 'pdf') => {
+    try {
+      await exportData(activityData, `analytics-dashboard-report`, { format })
+      success(`Отчет экспортирован в формате ${format.toUpperCase()}`)
+    } catch (err) {
+      error('Ошибка при экспорте данных')
+    }
+  }
 
   return (
-    <div className="py-6 space-y-6 min-h-screen bg-slate-50 max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="flex items-center justify-between px-6"
-      >
-        <div className="flex items-center space-x-6">
-          <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
-            <BarChart3 className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">{t('nav.analytics')}</h1>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <button 
-            onClick={() => setIsRealTimeActive(!isRealTimeActive)}
-            className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              isRealTimeActive 
-                ? 'bg-emerald-100 text-emerald-700' 
-                : 'bg-slate-200 text-slate-600'
-            }`}
-          >
-            {isRealTimeActive ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
-            <span>{t('header.real_time')}</span>
-          </button>
-
-        </div>
-      </motion.div>
-
-      {/* Main Title & Controls */}
-      <div className="px-6">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-2xl font-bold text-slate-900">{t('analytics.title')}</h1>
-          <div className="flex items-center space-x-2">
-            <button 
-              onClick={() => {
-                success('Data refreshed', 'Analytics data has been updated')
-                // Simulate refresh
-                setTimeout(() => window.location.reload(), 1000)
-              }}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
-              title="Refresh data"
-            >
-              <RefreshCw className="w-4 h-4" />
+      <PageHeader
+        title="Analytics"
+        actionButton={
+          <div className="flex items-center gap-3">
+            {/* Plan Upgrade Button */}
+            <button className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl text-sm font-medium hover:bg-indigo-100 transition-colors">
+              <Star className="w-4 h-4" />
+              Plan Upgrade
             </button>
-            <button 
-              onClick={async () => {
-                try {
-                  await exportData([], 'analytics-report', { format: 'csv' })
-                  success('Export completed', 'Analytics report has been downloaded')
-                } catch (err) {
-                  error('Export failed', 'Could not export analytics data')
-                }
-              }}
-              disabled={isExporting}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors disabled:opacity-50"
-              title="Export data"
-            >
-              {isExporting ? (
-                <RefreshCw className="w-4 h-4 animate-spin" />
-              ) : (
+
+            {/* Export Report Button */}
+            <div className="relative group">
+              <button className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm font-medium hover:bg-red-100 transition-colors">
                 <Download className="w-4 h-4" />
-              )}
-            </button>
-            <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">
-              <Settings className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-        
-        {/* Time Filter */}
-        <div className="flex space-x-2 text-sm">
-          {['1h', '6h', '24h', '7d', '30d', '90d'].map((range) => (
-            <button
-              key={range}
-              onClick={() => updateFilter('timeRange', range)}
-              className={`px-3 py-1 rounded-full text-xs transition-colors ${
-                filters.timeRange === range
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
-              }`}
-            >
-              {t(`time.${range}`, range)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main KPI Grid */}
-      <div className="px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {/* Total Impressions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
-                  <Eye className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-slate-600 text-sm font-medium">{t('analytics.total_impressions')}</p>
-                  <p className="text-2xl font-bold text-slate-900">24.7M</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center text-emerald-600 text-sm font-medium">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  +12.5%
-                </div>
-                <p className="text-slate-500 text-xs">vs last week</p>
-              </div>
-            </div>
-            
-            {/* Mini trend line */}
-            <div className="h-8 flex items-end space-x-1">
-              {[40, 60, 45, 80, 70, 90, 85].map((height, i) => (
-                <div
-                  key={i}
-                  className="flex-1 bg-slate-900 rounded-t"
-                  style={{ height: `${height}%` }}
-                />
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Total Clicks */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
-                  <MousePointer className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-slate-600 text-sm font-medium">{t('analytics.total_clicks')}</p>
-                  <p className="text-2xl font-bold text-slate-900">847K</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center text-emerald-600 text-sm font-medium">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  +8.2%
-                </div>
-                <p className="text-slate-500 text-xs">vs last week</p>
-              </div>
-            </div>
-            
-            {/* Mini trend line */}
-            <div className="h-8 flex items-end space-x-1">
-              {[30, 50, 70, 60, 80, 75, 85].map((height, i) => (
-                <div
-                  key={i}
-                  className="flex-1 bg-slate-900 rounded-t"
-                  style={{ height: `${height}%` }}
-                />
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Average CTR */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
-                  <Target className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-slate-600 text-sm font-medium">{t('analytics.average_ctr')}</p>
-                  <p className="text-2xl font-bold text-slate-900">3.43%</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center text-red-600 text-sm font-medium">
-                  <TrendingDown className="w-4 h-4 mr-1" />
-                  -2.1%
-                </div>
-                <p className="text-slate-500 text-xs">vs last week</p>
-              </div>
-            </div>
-            
-            {/* CTR quality indicator */}
-            <div className="w-full bg-slate-200 rounded-full h-2">
-              <div className="bg-slate-900 h-2 rounded-full" style={{ width: '68%' }}></div>
-            </div>
-          </motion.div>
-
-          {/* ROAS */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-slate-900 rounded-lg flex items-center justify-center">
-                  <DollarSign className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="text-slate-600 text-sm font-medium">ROAS</p>
-                  <p className="text-2xl font-bold text-slate-900">4.2x</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="flex items-center text-emerald-600 text-sm font-medium">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  +15.3%
-                </div>
-                <p className="text-slate-500 text-xs">vs last week</p>
-              </div>
-            </div>
-            
-            {/* ROAS gauge */}
-            <div className="relative">
-              <div className="w-full h-2 bg-slate-200 rounded-full">
-                <div className="h-2 bg-emerald-500 rounded-full" style={{ width: '84%' }}></div>
-              </div>
-              <div className="text-xs text-slate-500 mt-1">Target: 3.5x</div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Secondary KPIs */}
-      <div className="px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 lg:gap-6">
-          {/* CPC */}
-          <motion.div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-6 h-6 bg-slate-800 rounded flex items-center justify-center">
-                <DollarSign className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-slate-600 text-sm">CPC</span>
-            </div>
-            <p className="text-xl font-bold text-slate-900">$0.87</p>
-            <p className="text-emerald-600 text-xs">-5.2%</p>
-          </motion.div>
-
-          {/* CPM */}
-          <motion.div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-6 h-6 bg-slate-800 rounded flex items-center justify-center">
-                <BarChart3 className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-slate-600 text-sm">CPM</span>
-            </div>
-            <p className="text-xl font-bold text-slate-900">$12.45</p>
-            <p className="text-red-600 text-xs">+3.1%</p>
-          </motion.div>
-
-          {/* Conversions */}
-          <motion.div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-6 h-6 bg-slate-800 rounded flex items-center justify-center">
-                <Target className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-slate-600 text-sm">Conversions</span>
-            </div>
-            <p className="text-xl font-bold text-slate-900">2,847</p>
-            <p className="text-emerald-600 text-xs">+18.7%</p>
-          </motion.div>
-
-          {/* Viewability */}
-          <motion.div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-6 h-6 bg-slate-800 rounded flex items-center justify-center">
-                <Eye className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-slate-600 text-sm">Viewability</span>
-            </div>
-            <p className="text-xl font-bold text-slate-900">87.3%</p>
-            <p className="text-emerald-600 text-xs">+2.1%</p>
-          </motion.div>
-
-          {/* Brand Safety */}
-          <motion.div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-6 h-6 bg-slate-800 rounded flex items-center justify-center">
-                <Shield className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-slate-600 text-sm">Brand Safety</span>
-            </div>
-            <p className="text-xl font-bold text-slate-900">99.1%</p>
-            <p className="text-emerald-600 text-xs">+0.3%</p>
-          </motion.div>
-
-          {/* Fraud Rate */}
-          <motion.div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center space-x-2 mb-2">
-              <div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center">
-                <AlertTriangle className="w-3 h-3 text-white" />
-              </div>
-              <span className="text-slate-600 text-sm">Fraud Rate</span>
-            </div>
-            <p className="text-xl font-bold text-slate-900">0.8%</p>
-            <p className="text-emerald-600 text-xs">-0.2%</p>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Device & Geo Analytics */}
-      <div className="px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-          {/* Device Performance */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-slate-800 text-lg font-medium">Device Performance</h3>
-              <button className="text-slate-400">
-                <MoreHorizontal className="w-4 h-4" />
+                Export Report
+                <ChevronDown className="w-4 h-4" />
               </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
-                    <Monitor className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-slate-900 font-medium">Desktop</p>
-                    <p className="text-slate-500 text-sm">52.3% share</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-slate-900 font-medium">$2.45</p>
-                  <p className="text-emerald-600 text-sm">CTR: 4.2%</p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-slate-700 rounded-lg flex items-center justify-center">
-                    <Smartphone className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-slate-900 font-medium">Mobile</p>
-                    <p className="text-slate-500 text-sm">38.7% share</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-slate-900 font-medium">$1.98</p>
-                  <p className="text-emerald-600 text-sm">CTR: 3.8%</p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-slate-500 rounded-lg flex items-center justify-center">
-                    <Tablet className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-slate-900 font-medium">Tablet</p>
-                    <p className="text-slate-500 text-sm">9.0% share</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-slate-900 font-medium">$3.12</p>
-                  <p className="text-red-600 text-sm">CTR: 2.1%</p>
-                </div>
+              <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-20 min-w-[140px]">
+                <button
+                  onClick={() => handleExport('csv')}
+                  className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl transition-colors"
+                >
+                  Export CSV
+                </button>
+                <button
+                  onClick={() => handleExport('xlsx')}
+                  className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Export Excel
+                </button>
+                <button
+                  onClick={() => handleExport('pdf')}
+                  className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-b-xl transition-colors"
+                >
+                  Export PDF
+                </button>
               </div>
             </div>
-          </motion.div>
+          </div>
+        }
+      />
 
-          {/* Geographic Performance */}
+      <div className="px-4 sm:px-6 lg:px-8 pb-6 space-y-6">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 text-sm text-gray-500">
+          <span>Dashboards</span>
+          <ChevronDown className="w-4 h-4 transform rotate-[-90deg]" />
+          <span className="text-gray-900 font-medium">Analytics</span>
+        </div>
+
+        {/* Top KPI Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        >
+          {kpiData.map((kpi, index) => (
+            <motion.div
+              key={kpi.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600">
+                  <kpi.icon className="w-6 h-6" />
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-1 text-sm">
+                    {getTrendIcon(kpi.trend)}
+                    <span className={`font-medium ${
+                      kpi.trend === 'up' ? 'text-green-600' : 
+                      kpi.trend === 'down' ? 'text-red-500' : 'text-gray-500'
+                    }`}>
+                      +{kpi.change}%
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">Increased</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-gray-600 text-sm font-medium mb-1">{kpi.title}</p>
+                <p className="text-3xl font-bold text-gray-900 mb-4">
+                  {typeof kpi.value === 'number' ? formatNumber(kpi.value) : kpi.value}
+                </p>
+                
+                {/* Mini Chart */}
+                <div className="flex items-end justify-between h-8 gap-1">
+                  {kpi.chartData.map((value, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 bg-gray-200 rounded-t hover:bg-gray-400 transition-colors cursor-pointer"
+                      style={{ height: `${value}%` }}
+                      onClick={() => info(`${kpi.title}: ${value}%`)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Session Duration Chart */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+            className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-6"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-slate-800 text-lg font-medium">Top Regions</h3>
-              <Globe className="w-5 h-5 text-slate-400" />
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Session Duration By Users</h3>
+                <div className="flex items-center gap-6 mt-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
+                    <span className="text-gray-600">Orders</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                    <span className="text-gray-600">Sales</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                    <span className="text-gray-600">Profit</span>
+                  </div>
+                </div>
+              </div>
+              <MoreVertical className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
             </div>
 
-            <div className="space-y-4">
-              {[
-                { country: 'United States', share: 42.3, ctr: 4.1, flag: '🇺🇸' },
-                { country: 'Germany', share: 18.7, ctr: 3.8, flag: '🇩🇪' },
-                { country: 'United Kingdom', share: 15.2, ctr: 4.3, flag: '🇬🇧' },
-                { country: 'Canada', share: 12.1, ctr: 3.9, flag: '🇨🇦' },
-                { country: 'Australia', share: 8.4, ctr: 4.0, flag: '🇦🇺' },
-              ].map((region, index) => (
-                <div key={region.country} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <span className="text-lg">{region.flag}</span>
-                    <div>
-                      <p className="text-slate-900 font-medium">{region.country}</p>
-                      <p className="text-slate-500 text-sm">{region.share}% share</p>
+            {/* Chart */}
+            <div className="h-80 relative">
+              <div className="absolute inset-0 flex items-end justify-between px-4">
+                {monthlyData.map((data, index) => (
+                  <div key={data.month} className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-center gap-1 h-60">
+                      <div className="flex items-end gap-1 h-48">
+                        <div 
+                          className="w-3 bg-gray-600 rounded-t hover:bg-gray-700 transition-colors cursor-pointer"
+                          style={{ height: `${(data.orders / 70) * 100}%` }}
+                          onClick={() => info(`Orders: ${data.orders}`)}
+                        />
+                        <div 
+                          className="w-3 bg-gray-400 rounded-t hover:bg-gray-500 transition-colors cursor-pointer"
+                          style={{ height: `${(data.sales / 50) * 100}%` }}
+                          onClick={() => info(`Sales: ${data.sales}`)}
+                        />
+                        <div 
+                          className="w-3 bg-red-400 rounded-t hover:bg-red-500 transition-colors cursor-pointer"
+                          style={{ height: `${(data.profit / 60) * 100}%` }}
+                          onClick={() => info(`Profit: ${data.profit}`)}
+                        />
+                      </div>
+                      
+                      {/* Trend Line */}
+                      <div className="relative w-full h-12">
+                        <svg className="w-full h-full" viewBox="0 0 40 40">
+                          <polyline
+                            fill="none"
+                            stroke="#EF4444"
+                            strokeWidth="2"
+                            strokeDasharray="3,3"
+                            points={`0,${40 - (data.profit / 60) * 40} 20,${40 - (data.sales / 50) * 40} 40,${40 - (data.orders / 70) * 40}`}
+                          />
+                        </svg>
+                      </div>
                     </div>
+                    
+                    <span className="text-xs text-gray-500">{data.month}</span>
                   </div>
-                  <div className="text-right">
-                    <p className="text-emerald-600 font-medium">{region.ctr}% CTR</p>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </motion.div>
 
-          {/* Real-time Bidding */}
+          {/* Visitors Card */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            className="bg-slate-900 rounded-2xl p-6 shadow-sm text-white"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-white border border-gray-200 rounded-2xl p-6"
           >
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-white text-lg font-medium">Real-time Bidding</h3>
-              <div className={`w-3 h-3 rounded-full ${isRealTimeActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-600'}`}></div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Visitors</h3>
+
+            {/* Circular Progress */}
+            <div className="relative w-40 h-40 mx-auto mb-6">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle cx="80" cy="80" r="70" stroke="#E5E7EB" strokeWidth="8" fill="none" />
+                <circle
+                  cx="80" cy="80" r="70" stroke="#6B7280" strokeWidth="8" fill="none"
+                  strokeDasharray={`${2 * Math.PI * 70}`}
+                  strokeDashoffset={`${2 * Math.PI * 70 * (1 - 0.85)}`}
+                  className="transition-all duration-1000"
+                />
+                <circle
+                  cx="80" cy="80" r="70" stroke="#EF4444" strokeWidth="8" fill="none"
+                  strokeDasharray={`${2 * Math.PI * 70 * 0.15} ${2 * Math.PI * 70}`}
+                  className="transition-all duration-1000"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">219,147</div>
+                  <div className="text-sm text-gray-500">Total Visitors</div>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="text-center">
-                <p className="text-3xl font-bold text-white">1,247</p>
-                <p className="text-slate-400 text-sm">Bids/sec</p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="text-center">
-                  <p className="text-xl font-bold text-emerald-400">89</p>
-                  <p className="text-slate-400 text-xs">Win Rate %</p>
+            {/* Legend */}
+            <div className="space-y-3 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
+                  <span className="text-sm text-gray-700">Online visitors</span>
                 </div>
-                <div className="text-center">
-                  <p className="text-xl font-bold text-white">$2.34</p>
-                  <p className="text-slate-400 text-xs">Avg Price</p>
+                <span className="text-sm font-bold text-gray-900">1,86,758</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                  <span className="text-sm text-gray-700">Offline visitors</span>
+                </div>
+                <span className="text-sm font-bold text-gray-900">32,389</span>
+              </div>
+            </div>
+
+            {/* Audience Report */}
+            <div className="p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <div className="text-lg font-bold text-gray-900">12,890</div>
+                  <div className="text-sm text-gray-600">Currently active now</div>
+                </div>
+                <div className="flex items-center gap-1 text-green-600">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-sm font-medium">10.5%</span>
                 </div>
               </div>
-
-              {/* Mini activity chart */}
-              <div className="h-16 flex items-end justify-center space-x-1">
+              
+              <div className="h-8 flex items-end justify-between gap-px">
                 {Array.from({ length: 20 }, (_, i) => (
                   <div
                     key={i}
-                    className="w-1 bg-emerald-400 rounded-t animate-pulse"
-                    style={{ 
-                      height: `${Math.random() * 100}%`,
-                      animationDelay: `${i * 0.1}s`
-                    }}
+                    className="flex-1 bg-gray-300 rounded-t"
+                    style={{ height: `${Math.random() * 100}%` }}
                   />
                 ))}
               </div>
             </div>
           </motion.div>
         </div>
-      </div>
 
-      {/* Main Charts Row */}
-      <div className="px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-          {/* Performance Radar */}
-          <RadarChart
-            data={performanceRadarData}
-            title="DSP Performance Metrics"
-            className="lg:col-span-1"
-          />
+        {/* Second Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sessions Duration By Time Heatmap */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-white border border-gray-200 rounded-2xl p-6"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Sessions Duration By Time</h3>
+            
+            <div className="grid grid-cols-7 gap-1 mb-4">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, dayIndex) => (
+                <div key={day} className="text-center">
+                  <div className="text-xs text-gray-500 mb-2">{day}</div>
+                  <div className="space-y-1">
+                    {Array.from({ length: 6 }, (_, hourIndex) => {
+                      const intensity = Math.random()
+                      return (
+                        <div
+                          key={hourIndex}
+                          className="w-6 h-6 rounded cursor-pointer hover:scale-110 transition-transform"
+                          style={{
+                            backgroundColor: intensity > 0.7 ? '#374151' : 
+                                           intensity > 0.4 ? '#6B7280' : 
+                                           intensity > 0.2 ? '#9CA3AF' : '#E5E7EB'
+                          }}
+                          onClick={() => info(`${day} ${hourIndex * 4}:00 - Activity: ${Math.round(intensity * 100)}%`)}
+                        />
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          {/* Team/Campaign Managers */}
-          <TeamCard 
-            members={teamMembers} 
-            title="Campaign Team"
-          />
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>12Am</span>
+              <span>6Am</span>
+              <span>12Pm</span>
+              <span>6Pm</span>
+            </div>
+          </motion.div>
+
+          {/* Browser Usage */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="bg-white border border-gray-200 rounded-2xl p-6"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Browser Usage</h3>
+            
+            <div className="space-y-4">
+              {browserData.map((browser, index) => (
+                <div
+                  key={browser.name}
+                  className="flex items-center justify-between py-2 hover:bg-gray-50 rounded-lg px-2 transition-colors cursor-pointer"
+                  onClick={() => success(`${browser.name}: ${formatNumber(browser.sessions)} sessions`)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="w-8 h-8 rounded-lg flex items-center justify-center text-white"
+                      style={{ backgroundColor: browser.color }}
+                    >
+                      {browser.name.charAt(0)}
+                    </div>
+                    <span className="text-sm font-medium text-gray-900">{browser.name}</span>
+                  </div>
+                  
+                  <div className="text-right">
+                    <div className="text-sm font-bold text-gray-900">
+                      {formatNumber(browser.sessions)}
+                    </div>
+                    <div className={`text-xs flex items-center gap-1 ${
+                      browser.change > 0 ? 'text-green-600' : 'text-red-500'
+                    }`}>
+                      {browser.change > 0 ? (
+                        <TrendingUp className="w-3 h-3" />
+                      ) : (
+                        <TrendingDown className="w-3 h-3" />
+                      )}
+                      <span>{browser.change > 0 ? '+' : ''}{browser.change}%</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Sessions By Country */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="bg-white border border-gray-200 rounded-2xl p-6"
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Sessions By Country</h3>
+            
+            <div className="space-y-4 mb-6">
+              {['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'United States', 'China'].map((country, index) => {
+                const value = (index + 1) * 15 + Math.random() * 20
+                return (
+                  <div key={country} className="flex items-center gap-3">
+                    <div className="w-20 text-xs text-gray-500 text-right">{country}</div>
+                    <div className="flex-1 bg-gray-100 rounded-full h-2">
+                      <div 
+                        className="bg-gray-600 h-2 rounded-full transition-all duration-500 hover:bg-gray-700 cursor-pointer"
+                        style={{ width: `${value}%` }}
+                        onClick={() => info(`${country}: ${Math.round(value)}% sessions`)}
+                      />
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>0</span>
+              <span>200</span>
+              <span>400</span>
+              <span>600</span>
+              <span>800</span>
+              <span>1000</span>
+              <span>1200</span>
+            </div>
+          </motion.div>
+
+          {/* Visitors By Countries */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="bg-white border border-gray-200 rounded-2xl p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Visitors By Countries</h3>
+              <button className="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                View All
+              </button>
+            </div>
+            
+            <div className="space-y-4">
+              {countriesData.map((country, index) => (
+                <div
+                  key={country.name}
+                  className="flex items-center justify-between py-2 hover:bg-gray-50 rounded-lg px-2 transition-colors cursor-pointer"
+                  onClick={() => info(`${country.name}: ${formatNumber(country.visitors)} visitors`)}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{country.flag}</span>
+                    <span className="text-sm font-medium text-gray-900">{country.name}</span>
+                  </div>
+                  <span className="text-sm font-bold text-gray-900">
+                    {formatNumber(country.visitors)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
-      </div>
 
-      {/* Campaign Performance Table */}
-      <div className="px-6">
+        {/* Bottom Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Earnings & Cost */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            className="lg:col-span-1 space-y-6"
+          >
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gray-600 rounded-xl flex items-center justify-center text-white">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">Earnings</div>
+                  <div className="text-2xl font-bold text-gray-900">$12,563.50</div>
+                  <div className="text-sm text-green-600 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    0.15%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-red-400 rounded-xl flex items-center justify-center text-white">
+                  <CreditCard className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">Cost</div>
+                  <div className="text-2xl font-bold text-gray-900">$6,156.38</div>
+                  <div className="text-sm text-green-600 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    2.50%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white">
+                      <TrendingUp className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">Productivity</div>
+                      <div className="text-lg font-bold text-gray-900">$95.5M</div>
+                      <div className="text-xs text-green-600 flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        4.77%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">Total Time On Project</div>
+                      <div className="text-lg font-bold text-gray-900">148:00h</div>
+                      <div className="text-xs text-green-600 flex items-center gap-1">
+                        <TrendingUp className="w-3 h-3" />
+                        3.36%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Project Categories */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            className="lg:col-span-2 bg-white border border-gray-200 rounded-2xl p-6"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Project categories</h3>
+              <button className="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                View All
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Total number of projects</span>
+                <span className="font-bold text-gray-900">18,643</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3 flex overflow-hidden">
+                <div className="bg-gray-600 h-full" style={{ width: '42.34%' }} />
+                <div className="bg-red-400 h-full" style={{ width: '13%' }} />
+                <div className="bg-green-500 h-full" style={{ width: '32%' }} />
+                <div className="bg-blue-500 h-full" style={{ width: '12.66%' }} />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-gray-600 rounded-full"></div>
+                  <span className="text-sm text-gray-600">UI Projects</span>
+                  <span className="text-sm font-medium text-green-600">(42.34%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                  <span className="text-sm text-gray-600">UX Projects</span>
+                  <span className="text-sm font-medium text-red-500">(13%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">Finance</span>
+                  <span className="text-sm font-medium text-green-600">(32%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">Banking</span>
+                  <span className="text-sm font-medium text-blue-600">(22.46%)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Project Statistics */}
+            <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-lg font-bold text-gray-900">166 ↑</div>
+                  <div className="text-xs text-gray-500">Active Projects</div>
+                  <div className="text-xs text-green-600">+0.9%</div>
+                  <div className="text-xs text-gray-400">More Projects are yet to start</div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-gray-900">538 ↑</div>
+                  <div className="text-xs text-gray-500">Completed Projects</div>
+                  <div className="text-xs text-green-600">+0.39%</div>
+                  <div className="text-xs text-gray-400">32 Completed this year</div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold text-red-500">$32,124.00 ↑</div>
+                  <div className="text-xs text-gray-500">Project Revenue</div>
+                  <div className="text-xs text-red-500">-0.15%</div>
+                  <div className="text-xs text-gray-400">Reached yearly target</div>
+                </div>
+              </div>
+
+              {/* Chart */}
+              <div className="h-32 flex items-end justify-between">
+                {monthlyData.slice(0, 12).map((data, index) => (
+                  <div key={data.month} className="flex flex-col items-center gap-1">
+                    <div className="flex flex-col items-end gap-px">
+                      <div 
+                        className="w-3 bg-gray-600 rounded-t hover:bg-gray-700 transition-colors cursor-pointer"
+                        style={{ height: `${(data.orders / 70) * 80}px` }}
+                        onClick={() => info(`Active Projects: ${data.orders}`)}
+                      />
+                      <div 
+                        className="w-3 bg-gray-300 rounded-t hover:bg-gray-400 transition-colors cursor-pointer"
+                        style={{ height: `${(data.sales / 50) * 80}px` }}
+                        onClick={() => info(`Completed Projects: ${data.sales}`)}
+                      />
+                    </div>
+                    <span className="text-xs text-gray-500">{data.month}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+
+          {/* To-Do List & Recent Transactions */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            className="lg:col-span-2 space-y-6"
+          >
+            {/* To-Do List */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">To-Do List</h3>
+              
+              <div className="space-y-3">
+                {todoItems.map((todo, index) => (
+                  <div
+                    key={todo.id}
+                    className={`flex items-center gap-3 p-3 border rounded-xl hover:bg-gray-50 transition-colors cursor-pointer ${
+                      todo.completed ? 'border-green-200 bg-green-50' : 'border-gray-200'
+                    }`}
+                    onClick={() => handleTodoToggle(todo.id)}
+                  >
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      todo.completed 
+                        ? 'border-green-500 bg-green-500 text-white' 
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}>
+                      {todo.completed && <CheckCircle className="w-3 h-3" />}
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className={`font-medium ${
+                        todo.completed ? 'text-green-700 line-through' : 'text-gray-900'
+                      }`}>
+                        {todo.title}
+                      </div>
+                      <div className="text-sm text-gray-500">{todo.dueDate}</div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(todo.priority)}`}>
+                        {todo.priority}
+                      </span>
+                      <button 
+                        className="text-gray-400 hover:text-gray-600"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          info(`Edit task: ${todo.title}`)
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Recent Transactions */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Recent Transactions</h3>
+              
+              <div className="space-y-3">
+                {transactionsData.map((transaction, index) => (
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 rounded-lg px-2 transition-colors cursor-pointer"
+                    onClick={() => info(`Transaction: ${transaction.description} - ${formatCurrency(transaction.amount)}`)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-medium"
+                        style={{ backgroundColor: transaction.color }}
+                      >
+                        {transaction.icon}
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">{transaction.description}</div>
+                        <div className="text-xs text-gray-400">{transaction.date}</div>
+                      </div>
+                    </div>
+                    
+                    <div className={`font-bold ${
+                      transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Completed Projects Circle */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-gray-900">28</div>
+                  <div className="text-sm text-gray-500 mb-2">Completed Projects</div>
+                  <div className="flex items-center gap-1 text-green-600">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="font-medium">0.45%</span>
+                  </div>
+                </div>
+                
+                <div className="relative w-20 h-20">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="40" cy="40" r="35" stroke="#E5E7EB" strokeWidth="6" fill="none" />
+                    <circle
+                      cx="40" cy="40" r="35" stroke="#6B7280" strokeWidth="6" fill="none"
+                      strokeDasharray={`${2 * Math.PI * 35}`}
+                      strokeDashoffset={`${2 * Math.PI * 35 * (1 - 0.48)}`}
+                      className="transition-all duration-1000"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-sm font-bold text-gray-900">48%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm text-gray-600">Projects In Progress</div>
+                    <div className="text-2xl font-bold text-gray-900">55.3%</div>
+                    <div className="flex items-center gap-1 text-red-500">
+                      <TrendingDown className="w-3 h-3" />
+                      <span className="text-sm">0.59</span>
+                    </div>
+                  </div>
+                  
+                  <div className="w-16 h-8">
+                    <svg className="w-full h-full">
+                      <polyline
+                        fill="none"
+                        stroke="#EF4444"
+                        strokeWidth="2"
+                        points="0,20 8,15 16,25 24,20 32,10 40,15 48,5 56,10 64,15"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Activity Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
-          className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100"
+          transition={{ delay: 1.3 }}
+          className="bg-white border border-gray-200 rounded-2xl p-6"
         >
-                      <div className="flex items-center justify-between mb-6">
-              <h3 className="text-slate-800 text-lg font-medium">{t('analytics.active_campaigns_performance')}</h3>
-              <div className="flex items-center space-x-2">
-                <button 
-                  onClick={() => success('Filter opened', 'Advanced filters are now available')}
-                  className="flex items-center space-x-1 px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-sm hover:bg-slate-200 transition-colors"
-                >
-                  <Filter className="w-4 h-4" />
-                  <span>Filter</span>
-                </button>
-                <button 
-                  onClick={async () => {
-                    try {
-                      await exportData([], 'campaigns-performance', { format: 'csv' })
-                      success('Campaign data exported', 'Performance report downloaded successfully')
-                    } catch (err) {
-                      error('Export failed', 'Could not export campaign data')
-                    }
-                  }}
-                  disabled={isExporting}
-                  className="px-3 py-1 bg-slate-900 text-white rounded-lg text-sm hover:bg-slate-800 transition-colors disabled:opacity-50"
-                >
-                  {isExporting ? 'Exporting...' : t('analytics.export')}
-                </button>
-              </div>
-            </div>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Activity</h3>
+            <MoreVertical className="w-5 h-5 text-gray-400 cursor-pointer hover:text-gray-600" />
+          </div>
           
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-100">
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-slate-700">Campaign</th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-slate-700">Status</th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-slate-700">Impressions</th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-slate-700">CTR</th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-slate-700">CPC</th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-slate-700">Conversions</th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-slate-700">ROAS</th>
-                  <th className="text-left py-4 px-4 text-sm font-semibold text-slate-700">Spend</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  {
-                    name: 'Summer Sale - Electronics',
-                    status: 'Active',
-                    impressions: '2.4M',
-                    ctr: '4.2%',
-                    cpc: '$0.87',
-                    conversions: '1,247',
-                    roas: '4.8x',
-                    spend: '$12,400'
-                  },
-                  {
-                    name: 'Brand Awareness - Fashion',
-                    status: 'Active',
-                    impressions: '1.8M',
-                    ctr: '3.1%',
-                    cpc: '$1.24',
-                    conversions: '892',
-                    roas: '3.2x',
-                    spend: '$8,900'
-                  },
-                  {
-                    name: 'Retargeting - Travel',
-                    status: 'Active',
-                    impressions: '945K',
-                    ctr: '5.7%',
-                    cpc: '$2.15',
-                    conversions: '456',
-                    roas: '6.1x',
-                    spend: '$15,600'
-                  },
-                  {
-                    name: 'Mobile App Install',
-                    status: 'Paused',
-                    impressions: '1.2M',
-                    ctr: '2.8%',
-                    cpc: '$0.65',
-                    conversions: '2,340',
-                    roas: '2.9x',
-                    spend: '$6,780'
-                  }
-                ].map((campaign, index) => (
-                  <tr key={index} className="border-b border-slate-50 hover:bg-slate-50">
-                    <td className="py-4 px-4">
-                      <div className="font-medium text-slate-900">{campaign.name}</div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        campaign.status === 'Active' 
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-slate-100 text-slate-600'
-                      }`}>
-                        {campaign.status}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-slate-700">{campaign.impressions}</td>
-                    <td className="py-4 px-4">
-                      <span className={`font-medium ${
-                        parseFloat(campaign.ctr) > 4 ? 'text-emerald-600' : 'text-slate-700'
-                      }`}>
-                        {campaign.ctr}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-slate-700">{campaign.cpc}</td>
-                    <td className="py-4 px-4 text-slate-700">{campaign.conversions}</td>
-                    <td className="py-4 px-4">
-                      <span className={`font-medium ${
-                        parseFloat(campaign.roas) > 4 ? 'text-emerald-600' : 'text-slate-700'
-                      }`}>
-                        {campaign.roas}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-slate-700">{campaign.spend}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
+            {activityData.map((activity, index) => (
+              <div
+                key={activity.label}
+                className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
+                onClick={() => success(`${activity.label}: ${activity.value}`)}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${
+                  index % 6 === 0 ? 'bg-purple-500' :
+                  index % 6 === 1 ? 'bg-red-400' :
+                  index % 6 === 2 ? 'bg-green-500' :
+                  index % 6 === 3 ? 'bg-amber-500' :
+                  index % 6 === 4 ? 'bg-blue-400' : 'bg-pink-500'
+                }`}>
+                  {index % 6 === 0 ? <Target className="w-5 h-5" /> :
+                   index % 6 === 1 ? <Package className="w-5 h-5" /> :
+                   index % 6 === 2 ? <ShoppingBag className="w-5 h-5" /> :
+                   index % 6 === 3 ? <DollarSign className="w-5 h-5" /> :
+                   index % 6 === 4 ? <TrendingDown className="w-5 h-5" /> :
+                   <TrendingUp className="w-5 h-5" />}
+                </div>
+                <div>
+                  <div className="text-sm text-gray-600">{activity.label}</div>
+                  <div className="text-lg font-bold text-gray-900">{activity.value}</div>
+                  <div className={`text-xs flex items-center gap-1 ${
+                    activity.trend === 'up' ? 'text-green-600' : 'text-red-500'
+                  }`}>
+                    {activity.trend === 'up' ? (
+                      <TrendingUp className="w-3 h-3" />
+                    ) : (
+                      <TrendingDown className="w-3 h-3" />
+                    )}
+                    <span>{activity.change > 0 ? '+' : ''}{activity.change}%</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>

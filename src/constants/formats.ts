@@ -68,21 +68,21 @@ export const VALIDATION_PATTERNS = {
 // Статусы на русском языке
 export const STATUS_LABELS = {
   draft: 'Черновик',
-  moderation: 'На модерации',
+  pending: 'На модерации',
   active: 'Активна',
   paused: 'Пауза',
   rejected: 'Отклонена',
   completed: 'Завершена',
 } as const
 
-// Цвета статусов
+// Цвета статусов - новая палитра
 export const STATUS_COLORS = {
-  draft: 'gray',
-  moderation: 'yellow',
-  active: 'green',
-  paused: 'blue',
-  rejected: 'red',
-  completed: 'gray',
+  draft: 'status-draft',
+  pending: 'status-pending',
+  active: 'status-active',
+  paused: 'status-paused',
+  rejected: 'status-rejected',
+  completed: 'status-completed',
 } as const
 
 // Периоды для лимитов

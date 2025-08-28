@@ -18,17 +18,17 @@ interface TeamCardProps {
 const TeamCard: React.FC<TeamCardProps> = ({ members, title = "Team", className = '' }) => {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'online': return 'bg-green-400'
-      case 'away': return 'bg-yellow-400'
-      case 'offline': return 'bg-gray-400'
-      default: return 'bg-gray-400'
+      case 'online': return 'bg-emerald-400'
+      case 'away': return 'bg-amber-400'
+      case 'offline': return 'bg-slate-400'
+      default: return 'bg-slate-400'
     }
   }
 
   const getRandomColor = (index: number) => {
     const colors = [
-      'bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500',
-      'bg-indigo-500', 'bg-red-500', 'bg-yellow-500', 'bg-teal-500'
+      'bg-sky-400', 'bg-emerald-400', 'bg-violet-400', 'bg-rose-400',
+      'bg-indigo-400', 'bg-amber-400', 'bg-teal-400', 'bg-slate-400'
     ]
     return colors[index % colors.length]
   }

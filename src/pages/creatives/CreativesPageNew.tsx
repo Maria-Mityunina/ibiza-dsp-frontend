@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Plus, Copy, Edit, Trash2, Search, Filter, Image as ImageIcon, FileText } from 'lucide-react'
+import { Plus, Copy, Edit, Search, Filter, Image as ImageIcon, FileText } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
-import { StatusControl, BudgetControl, DataCard, DataCardStat, Pagination, SearchFilters, ActionButton, ResponsiveGrid } from '@components/ui'
+import { StatusControl, BudgetControl, DataCard, DataCardStat, Pagination, ActionButton } from '@components/ui'
 import { PageHeader } from '@components/layout'
 import { CreateCreativeForm } from '@components/forms'
 
@@ -247,13 +247,6 @@ const CreativesPage: React.FC = () => {
     success('Креатив скопирован')
   }
 
-  const handleDeleteCreative = (id: string, name: string) => {
-    if (window.confirm(`Вы уверены, что хотите удалить креатив "${name}"?`)) {
-      setCreatives(prev => prev.filter(creative => creative.id !== id))
-      success('Креатив успешно удален')
-    }
-  }
-
   const formatCurrency = (value: number) => `${value}$`
 
   return (
@@ -273,43 +266,59 @@ const CreativesPage: React.FC = () => {
         }
       />
 
-    <div className="space-y-6">
+      <div className="space-y-6">
         {/* Filters */}
-        <SearchFilters
-          searchTerm={searchTerm}
-          onSearchChange={(value) => {
-            setSearchTerm(value)
-            setCurrentPage(1)
-          }}
-          searchPlaceholder="Поиск креативов..."
-          statusFilter={statusFilter}
-          onStatusChange={(value) => {
-            setStatusFilter(value)
-            setCurrentPage(1)
-          }}
-          extraFilters={
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Поиск креативов..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value)
+                setCurrentPage(1)
+              }}
+              className="glass-input pl-10"
+            />
+          </div>
+          <div className="flex gap-4">
+            <div className="relative">
+              <Filter className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value)
+                  setCurrentPage(1)
+                }}
+                className="glass-select pl-10"
+              >
+                <option value="all">Все статусы</option>
+                <option value="active">Активные</option>
+                <option value="paused">На паузе</option>
+                <option value="draft">Черновик</option>
+                <option value="completed">Завершенные</option>
+                <option value="pending">На модерации</option>
+              </select>
+            </div>
             <select
               value={typeFilter}
               onChange={(e) => {
                 setTypeFilter(e.target.value)
                 setCurrentPage(1)
               }}
-              className="glass-select min-w-[140px]"
+              className="glass-select"
             >
               <option value="all">Все типы</option>
               <option value="big">Большие</option>
               <option value="small">Маленькие</option>
             </select>
-          }
-        />
+          </div>
+        </div>
 
         {/* Creatives Grid */}
         {paginatedCreatives.length > 0 ? (
-          <ResponsiveGrid
-            columns={{ mobile: 1, tablet: 2, desktop: 3 }}
-            gap="md"
-            minItemWidth="280px"
-          >
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
             {paginatedCreatives.map((creative) => (
               <DataCard
                 key={creative.id}
@@ -337,16 +346,6 @@ const CreativesPage: React.FC = () => {
                     >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeleteCreative(creative.id, creative.name)
-                      }}
-                      className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                      title="Удалить"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
                   </div>
                 }
                 className="h-full"
@@ -367,8 +366,8 @@ const CreativesPage: React.FC = () => {
                         <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                         <p className="text-xs text-gray-500 leading-tight">
                           {creative.title || creative.name}
-            </p>
-          </div>
+                        </p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -415,7 +414,7 @@ const CreativesPage: React.FC = () => {
                 </div>
               </DataCard>
             ))}
-          </ResponsiveGrid>
+          </div>
         ) : (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">
@@ -432,7 +431,7 @@ const CreativesPage: React.FC = () => {
                 Создать первый креатив
               </button>
             )}
-        </div>
+          </div>
         )}
 
         {/* Pagination */}
@@ -444,7 +443,7 @@ const CreativesPage: React.FC = () => {
             className="mt-8"
           />
         )}
-    </div>
+      </div>
 
       {/* Create Creative Form */}
       <CreateCreativeForm

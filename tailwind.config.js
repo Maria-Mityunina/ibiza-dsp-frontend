@@ -6,6 +6,13 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        'xxl': '1440px',
+      },
+      maxWidth: {
+        '8xl': '90rem', // 1440px
+        '9xl': '100rem', // 1600px
+      },
       colors: {
         // Современная профессиональная палитра для DSP платформы
         primary: {

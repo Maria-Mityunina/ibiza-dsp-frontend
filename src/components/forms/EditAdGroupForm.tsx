@@ -251,7 +251,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
               <select
                 value={formData.platform}
                 onChange={(e) => handleInputChange('platform', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                className="glass-select"
               >
                 {platformOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -306,7 +306,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
                 type="text"
                 value="Черновик"
                 disabled
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                className="glass-input bg-gray-50 text-gray-500"
               />
             </div>
 
@@ -352,7 +352,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
                   <select
                     value={formData.startTime}
                     onChange={(e) => handleInputChange('startTime', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="glass-select"
                   >
                     {timeOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -366,7 +366,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
                   <select
                     value={formData.endTime}
                     onChange={(e) => handleInputChange('endTime', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="glass-select"
                   >
                     {timeOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -401,7 +401,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
                   <select
                     value={formData.userFrequencyPeriod}
                     onChange={(e) => handleInputChange('userFrequencyPeriod', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="glass-select"
                   >
                     {periodOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -436,7 +436,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
                   <select
                     value={formData.adFrequencyPeriod}
                     onChange={(e) => handleInputChange('adFrequencyPeriod', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="glass-select"
                   >
                     {periodOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -471,7 +471,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
                   <select
                     value={formData.clickPeriod}
                     onChange={(e) => handleInputChange('clickPeriod', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    className="glass-select"
                   >
                     {periodOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -491,7 +491,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
               <select
                 value={formData.segments[0] || ''}
                 onChange={(e) => handleInputChange('segments', e.target.value ? [e.target.value] : [])}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                className="glass-select"
               >
                 <option value="">Перетащите файл сюда, чтобы загрузить новый сегмент</option>
                 {segmentOptions.map(option => (
@@ -510,7 +510,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
               <select
                 value={formData.phoneModel}
                 onChange={(e) => handleInputChange('phoneModel', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                className="glass-select"
               >
                 {phoneModelOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -528,7 +528,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
               <select
                 value={formData.region}
                 onChange={(e) => handleInputChange('region', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                className="glass-select"
               >
                 {regionOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -546,7 +546,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
               <select
                 value={formData.language}
                 onChange={(e) => handleInputChange('language', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                className="glass-select"
               >
                 {languageOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -564,7 +564,7 @@ const EditAdGroupForm: React.FC<EditAdGroupFormProps> = ({
               <select
                 value={formData.osVersion}
                 onChange={(e) => handleInputChange('osVersion', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                className="glass-select"
               >
                 {osVersionOptions.map(option => (
                   <option key={option.value} value={option.value}>

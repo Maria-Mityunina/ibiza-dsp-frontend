@@ -29,24 +29,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           href: '/advertisers',
           icon: Users,
           permission: 'view_advertisers',
-        },
-        {
-          name: t('nav.campaigns', 'Рекламные кампании'),
-          href: '/campaigns',
-          icon: BarChart3,
-          permission: 'view_campaigns',
-        },
-        {
-          name: t('nav.adgroups', 'Группы объявлений'),
-          href: '/adgroups',
-          icon: Layers,
-          permission: 'view_adgroups',
-        },
-        {
-          name: t('nav.creatives', 'Креативы'),
-          href: '/creatives',
-          icon: Palette,
-          permission: 'view_creatives',
         }
       ]
     },
@@ -64,30 +46,12 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
     },
     {
       id: 'analytics',
-      title: t('nav.dsp_analytics', 'DSP Аналитика'),
+      title: t('nav.analytics', 'Статистика'),
       items: [
         {
-          name: t('nav.analytics', 'Общая аналитика'),
+          name: t('nav.analytics', 'Статистика'),
           href: '/analytics',
           icon: TrendingUp,
-          permission: 'view_analytics',
-        },
-        {
-          name: t('nav.fraud_detection', 'Fraud Detection'),
-          href: '/fraud-detection',
-          icon: Shield,
-          permission: 'view_analytics',
-        },
-        {
-          name: t('nav.audience_insights', 'Audience Insights'),
-          href: '/audience-insights',
-          icon: Users,
-          permission: 'view_analytics',
-        },
-        {
-          name: t('nav.creative_performance', 'Creative Performance'),
-          href: '/creative-performance',
-          icon: Palette,
           permission: 'view_analytics',
         }
       ]
@@ -119,13 +83,13 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                     {/* Sidebar */}
       <motion.div
         className={clsx(
-          'h-full w-80 flex-shrink-0 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:z-auto ml-6',
+          'h-full w-72 flex-shrink-0 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:z-auto',
           'fixed inset-y-0 left-0 z-30 lg:static',
           open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
-        {/* Glassmorphism background */}
-        <div className="absolute inset-0 bg-white/70 backdrop-blur-xl border border-black/10 rounded-2xl shadow-lg"></div>
+        {/* White background like header */}
+        <div className="absolute inset-0 bg-white border-r border-gray-200 lg:shadow-none shadow-xl"></div>
         
         <div className="relative h-full flex flex-col p-2">
           {/* Header */}
@@ -136,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
             
             {/* Close button for mobile */}
             <button
-              className="lg:hidden p-2 rounded-xl text-gray-600 hover:text-black hover:bg-black/5 absolute right-4 transition-all duration-300"
+              className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 absolute right-4 transition-colors"
               onClick={() => setOpen(false)}
             >
               <X className="h-6 w-6" />
@@ -153,7 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                   {/* Section header - только в развернутом состоянии */}
                   {!false && (
                     <div 
-                      className="flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 cursor-pointer hover:text-black transition-all duration-300 rounded-xl hover:bg-black/5"
+                      className="flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 cursor-pointer hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100"
                       onClick={() => toggleSection(section.id)}
                     >
                       <span>{section.title}</span>
@@ -194,20 +158,20 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
                             key={item.name}
                             to={item.href}
                             className={clsx(
-                              'group flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative',
+                              'group flex items-center text-sm font-medium rounded-lg transition-colors relative',
                               false ? 'px-3 py-3 justify-center' : 'px-4 py-3',
                               active
-                                ? 'bg-black/10 text-black border-l-4 border-black backdrop-blur-sm'
-                                : 'text-gray-700 hover:bg-black/5 hover:text-black'
+                                ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-900'
+                                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                             )}
                             onClick={() => setOpen(false)}
                             title={false ? item.name : undefined}
                           >
                             <Icon
                               className={clsx(
-                                'h-5 w-5 transition-colors duration-300',
+                                'h-5 w-5 transition-colors',
                                 false ? 'mr-0' : 'mr-3',
-                                active ? 'text-black' : 'text-gray-600 group-hover:text-black'
+                                active ? 'text-slate-900' : 'text-gray-600 group-hover:text-gray-900'
                               )}
                             />
                             <AnimatePresence>
@@ -234,7 +198,7 @@ const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
           </nav>
 
           {/* Footer */}
-          <div className="px-6 py-6 border-t border-black/10 mt-auto">
+          <div className="px-6 py-6 border-t border-gray-200 mt-auto">
             <AnimatePresence>
               {!false && (
                 <motion.div

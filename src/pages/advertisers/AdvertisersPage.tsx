@@ -1,8 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Eye, Copy, TrendingUp, DollarSign, Users } from 'lucide-react'
+import { Plus, Edit, Trash2, TrendingUp, Eye, BarChart3, Search, Filter } from 'lucide-react'
 import { useLanguageStore } from '@stores/languageStore'
 import { useToast } from '@hooks/useToast'
+import { BudgetControl, DataTable, Pagination, SearchFilters, ActionButton } from '@components/ui'
+import { PageHeader } from '@components/layout'
 import { CreateAdvertiserForm } from '@components/forms'
 
 interface Advertiser {
@@ -10,353 +13,329 @@ interface Advertiser {
   name: string
   legalName: string
   inn: string
+  kpp?: string
+  ogrn?: string
+  legalAddress?: string
+  bik?: string
+  accountNumber?: string
+  contractNumber?: string
+  contractDate?: string
+  useAutoMarketing?: boolean
   budget: number
   spent: number
   ctr: number
   campaigns: number
-  status: 'active' | 'paused' | 'draft'
+  status: 'active' | 'inactive' | 'pending' | 'draft' | 'paused' | 'stopped' | 'completed' | 'rejected'
   createdAt: string
 }
 
 const AdvertisersPage: React.FC = () => {
   const { t } = useLanguageStore()
   const { success } = useToast()
-  
+  const navigate = useNavigate()
+
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 100
+
   const [advertisers, setAdvertisers] = useState<Advertiser[]>([
     {
       id: '1',
-      name: 'ООО "Технологии будущего"',
-      legalName: 'Общество с ограниченной ответственностью "Технологии будущего"',
-      inn: '123456789012',
-      budget: 500000,
-      spent: 125000,
-      ctr: 2.45,
-      campaigns: 5,
+      name: 'ООО Зеленоглазое такси',
+      legalName: 'ООО "Зеленоглазое такси"',
+      inn: '1234567890',
+      budget: 1000,
+      spent: 45,
+      ctr: 3,
+      campaigns: 12,
       status: 'active',
       createdAt: '2024-01-15T10:00:00Z'
     },
     {
       id: '2',
-      name: 'ИП Петров А.И.',
-      legalName: 'Индивидуальный предприниматель Петров Андрей Иванович',
-      inn: '123456789013',
-      budget: 250000,
-      spent: 89500,
-      ctr: 1.87,
-      campaigns: 3,
+      name: 'ОАО Мама я в дубае',
+      legalName: 'ОАО "Мама я в дубае"',
+      inn: '0987654321',
+      budget: 0,
+      spent: 100,
+      ctr: 3,
+      campaigns: 8,
       status: 'active',
       createdAt: '2024-02-01T09:15:00Z'
-    }
+    },
+    {
+      id: '3',
+      name: 'ОАО Мой друг Лёша танцует лёжа',
+      legalName: 'ОАО "Мой друг Лёша танцует лёжа"',
+      inn: '5555666677',
+      budget: 1500,
+      spent: 45,
+      ctr: 3,
+      campaigns: 5,
+      status: 'active',
+      createdAt: '2024-03-01T08:30:00Z'
+    },
+    {
+      id: '4',
+      name: 'ООО Моя оборона',
+      legalName: 'ООО "Моя оборона"',
+      inn: '1111222233',
+      budget: 900,
+      spent: 45,
+      ctr: 3,
+      campaigns: 3,
+      status: 'active',
+      createdAt: '2024-04-01T12:00:00Z'
+    },
+    // Дополнительные рекламодатели для демонстрации пагинации
+    ...Array.from({ length: 20 }, (_, i) => ({
+      id: `${i + 5}`,
+      name: `Рекламодатель ${i + 5}`,
+      legalName: `ООО "Рекламодатель ${i + 5}"`,
+      inn: `${1000000000 + i}`,
+      budget: Math.floor(Math.random() * 5000) + 500,
+      spent: Math.floor(Math.random() * 200) + 10,
+      ctr: Math.floor(Math.random() * 10) + 1,
+      campaigns: Math.floor(Math.random() * 20) + 1,
+      status: ['active', 'paused', 'draft', 'pending'][Math.floor(Math.random() * 4)] as any,
+      createdAt: `2024-0${Math.floor(Math.random() * 5) + 1}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}T${String(Math.floor(Math.random() * 24)).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}:00Z`
+    }))
   ])
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-emerald-100 text-emerald-700'
-      case 'paused': return 'bg-yellow-100 text-yellow-700'
-      case 'draft': return 'bg-gray-100 text-gray-700'
-      default: return 'bg-gray-100 text-gray-700'
+  // Filtered and paginated data
+  const filteredAdvertisers = useMemo(() => {
+    return advertisers.filter(advertiser => {
+      const matchesSearch = advertiser.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           advertiser.legalName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           advertiser.inn.includes(searchTerm)
+      const matchesStatus = statusFilter === 'all' || advertiser.status === statusFilter
+      return matchesSearch && matchesStatus
+    })
+  }, [advertisers, searchTerm, statusFilter])
+
+  const totalPages = Math.ceil(filteredAdvertisers.length / itemsPerPage)
+  const paginatedAdvertisers = filteredAdvertisers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  )
+
+  const handleCreateAdvertiser = (data: any) => {
+    const newAdvertiser: Advertiser = {
+      id: Date.now().toString(),
+      name: data.name,
+      legalName: data.legalName,
+      inn: data.inn,
+      kpp: data.kpp,
+      ogrn: data.ogrn,
+      legalAddress: data.legalAddress,
+      bik: data.bik,
+      accountNumber: data.account,
+      contractNumber: data.contractNumber,
+      contractDate: data.contractDate,
+      useAutoMarketing: data.useAutoMarking,
+      budget: 0,
+      spent: 0,
+      ctr: 0,
+      campaigns: 0,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    }
+
+    setAdvertisers(prev => [newAdvertiser, ...prev])
+  }
+
+  const handleBudgetChange = (id: string, newBudget: number) => {
+    setAdvertisers(prev => prev.map(advertiser => 
+      advertiser.id === id 
+        ? { ...advertiser, budget: newBudget }
+        : advertiser
+    ))
+  }
+
+  const handleDeleteAdvertiser = (id: string, name: string) => {
+    if (window.confirm(`Вы уверены, что хотите удалить рекламодателя "${name}"?`)) {
+      setAdvertisers(prev => prev.filter(advertiser => advertiser.id !== id))
+      success('Рекламодатель успешно удален')
     }
   }
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('ru-RU', {
-      style: 'currency',
-      currency: 'RUB',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value)
+    return `${value}$`
   }
 
-  const handleCreateAdvertiser = (data: any) => {
-    const newAdvertiser: Advertiser = {
-      id: (advertisers.length + 1).toString(),
-      name: data.name,
-      legalName: data.legalName,
-      inn: data.inn,
-      budget: data.budget,
-      spent: 0,
-      ctr: 0,
-      campaigns: 0,
-      status: 'draft',
-      createdAt: new Date().toISOString()
+  const columns = [
+    {
+      key: 'name',
+      title: 'Название',
+      priority: 'high' as const,
+      render: (value: any, advertiser: Advertiser) => (
+        <div className="flex items-center gap-3">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`/advertisers/${advertiser.id}/edit`)
+            }}
+            className="p-1 text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0"
+            title="Редактировать"
+          >
+            <Edit className="w-4 h-4" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDeleteAdvertiser(advertiser.id, advertiser.name)
+            }}
+            className="p-1 text-gray-400 hover:text-red-600 transition-colors flex-shrink-0"
+            title="Удалить"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+          <div className="min-w-0 flex-1">
+            <button
+              onClick={() => navigate(`/advertisers/${advertiser.id}/campaigns`)}
+              className="text-sm font-normal text-gray-900 hover:text-gray-700 transition-colors text-left block truncate w-full"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              {advertiser.name}
+            </button>
+            <p 
+              className="text-xs text-gray-500 mt-1 truncate font-normal"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              {advertiser.legalName}
+            </p>
+          </div>
+        </div>
+      ),
+      width: 'w-1/2'
+    },
+    {
+      key: 'budget',
+      title: 'Бюджет',
+      priority: 'high' as const,
+      render: (value: any, advertiser: Advertiser) => (
+        <BudgetControl
+          budget={advertiser.budget}
+          spent={advertiser.spent}
+          onBudgetChange={(newBudget) => handleBudgetChange(advertiser.id, newBudget)}
+          size="sm"
+          showProgress={false}
+        />
+      ),
+      width: 'w-32'
+    },
+    {
+      key: 'ctr',
+      title: 'CTR',
+      priority: 'medium' as const,
+      render: (value: any, advertiser: Advertiser) => (
+        <span 
+          className="text-sm font-normal text-gray-900"
+          style={{ fontFamily: 'Montserrat, sans-serif' }}
+        >
+          {advertiser.ctr}%
+        </span>
+      ),
+      width: 'w-20'
+    },
+    {
+      key: 'spent',
+      title: 'Потрачено',
+      priority: 'low' as const,
+      render: (value: any, advertiser: Advertiser) => (
+        <span 
+          className="text-sm font-normal text-gray-900"
+          style={{ fontFamily: 'Montserrat, sans-serif' }}
+        >
+          {formatCurrency(advertiser.spent)}
+        </span>
+      ),
+      width: 'w-24'
+    },
+    {
+      key: 'status',
+      title: 'Статус',
+      priority: 'high' as const,
+      render: (value: any, advertiser: Advertiser) => (
+        <span 
+          className={`px-3 py-1 rounded-lg text-xs font-normal border ${
+            advertiser.status === 'active' 
+              ? 'status-active' 
+              : 'status-inactive'
+          }`}
+          style={{ fontFamily: 'Montserrat, sans-serif' }}
+        >
+          {advertiser.status === 'active' ? 'Активен' : 'Неактивен'}
+        </span>
+      ),
+      width: 'w-24'
     }
-    
-    setAdvertisers([...advertisers, newAdvertiser])
-    setShowCreateForm(false)
-    success('Рекламодатель создан успешно!')
-  }
-
-  const totalAdvertisers = advertisers.length
-  const activeAdvertisers = advertisers.filter(a => a.status === 'active').length
-  const totalBudget = advertisers.reduce((sum, a) => sum + a.budget, 0)
-  const totalSpent = advertisers.reduce((sum, a) => sum + a.spent, 0)
+  ]
 
   return (
-    <motion.div 
-      className="max-w-full overflow-x-hidden"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-light text-black mb-2">
-            {t('nav.advertisers')}
-          </h1>
-          <p className="text-gray-600 font-light">
-            {t('advertiser.manage_advertisers')}
-          </p>
-        </div>
-        
-        <button
-          onClick={() => setShowCreateForm(true)}
-          className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-medium"
-        >
-          <Plus className="h-4 w-4" />
-          {t('advertiser.create_new')}
-        </button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <motion.div 
-          className="bg-blue-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-100 rounded-xl">
-              <Users className="h-5 w-5 text-blue-600" />
-            </div>
-            <span className="text-sm text-gray-600">{t('metric.impressions')}</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {totalAdvertisers.toLocaleString()}
-          </div>
-          <div className="text-xs text-gray-500">
-            {activeAdvertisers} {t('status.active').toLowerCase()}
-          </div>
-        </motion.div>
-
-        <motion.div 
-          className="bg-green-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-green-100 rounded-xl">
-              <DollarSign className="h-5 w-5 text-green-600" />
-            </div>
-            <span className="text-sm text-gray-600">{t('metric.budget')}</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {formatCurrency(totalBudget)}
-          </div>
-        </motion.div>
-
-        <motion.div 
-          className="bg-purple-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-purple-100 rounded-xl">
-              <TrendingUp className="h-5 w-5 text-purple-600" />
-            </div>
-            <span className="text-sm text-gray-600">{t('metric.spend')}</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {formatCurrency(totalSpent)}
-          </div>
-        </motion.div>
-
-        <motion.div 
-          className="bg-orange-50 p-6 rounded-2xl"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-orange-100 rounded-xl">
-              <TrendingUp className="h-5 w-5 text-orange-600" />
-            </div>
-            <span className="text-sm text-gray-600">{t('metric.ctr')}</span>
-          </div>
-          <div className="text-2xl font-semibold text-gray-900 mb-1">
-            {((totalSpent / totalBudget) * 100 || 0).toFixed(1)}%
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Advertisers List Header */}
-      <div className="mb-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">
-          {t('advertiser.all_advertisers')}
-        </h2>
-      </div>
-
-      {/* Advertisers List */}
-      <div className="space-y-4">
-        {advertisers.map((advertiser, index) => (
-          <motion.div
-            key={advertiser.id}
-            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-            whileHover={{ y: -2 }}
-          >
-            {/* Desktop Layout */}
-            <div className="hidden lg:flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-4 mb-2">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {advertiser.name}
-                  </h3>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(advertiser.status)}`}>
-                    {t(`status.${advertiser.status}`)}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 mb-3">
-                  {advertiser.legalName} • ИНН: {advertiser.inn}
-                </p>
-                <div className="flex items-center gap-8">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">{t('form.budget')}:</span>
-                    <span className="text-sm font-medium">{formatCurrency(advertiser.budget)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">{t('metric.spend')}:</span>
-                    <span className="text-sm font-medium">{formatCurrency(advertiser.spent)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">{t('metric.ctr')}:</span>
-                    <span className="text-sm font-medium">{advertiser.ctr}%</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">{t('metric.cpm')}:</span>
-                    <span className="text-sm font-medium">{advertiser.campaigns}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => success('Рекламодатель скопирован')}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
-                  title={t('action.copy')}
-                >
-                  <Copy className="h-4 w-4" />
-                </button>
-                <button
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
-                  title={t('action.edit')}
-                >
-                  <Edit className="h-4 w-4" />
-                </button>
-                <button
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
-                  title={t('advertiser.view_campaigns')}
-                >
-                  <Eye className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile Layout */}
-            <div className="lg:hidden">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-gray-900 mb-1">
-                    {advertiser.name}
-                  </h3>
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(advertiser.status)}`}>
-                    {t(`status.${advertiser.status}`)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => success('Рекламодатель скопирован')}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200">
-                    <Edit className="h-4 w-4" />
-                  </button>
-                  <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-all duration-200">
-                    <Eye className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-              
-              <p className="text-sm text-gray-500 mb-4">
-                ИНН: {advertiser.inn}
-              </p>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <span className="text-xs text-gray-500 block">{t('form.budget')}</span>
-                  <span className="text-sm font-medium">{formatCurrency(advertiser.budget)}</span>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-500 block">{t('metric.spend')}</span>
-                  <span className="text-sm font-medium">{formatCurrency(advertiser.spent)}</span>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-500 block">{t('metric.ctr')}</span>
-                  <span className="text-sm font-medium">{advertiser.ctr}%</span>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-500 block">Кампаний</span>
-                  <span className="text-sm font-medium">{advertiser.campaigns}</span>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {advertisers.length === 0 && (
-        <motion.div 
-          className="text-center py-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="text-gray-400 mb-4">
-            <Users className="h-16 w-16 mx-auto" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Нет рекламодателей
-          </h3>
-          <p className="text-gray-500 mb-6">
-            Создайте первого рекламодателя для начала работы
-          </p>
-          <button
+    <>
+      <PageHeader
+        title="Рекламодатели"
+        subtitle={`Всего: ${filteredAdvertisers.length} рекламодателей`}
+        actionButton={
+          <ActionButton
             onClick={() => setShowCreateForm(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all duration-300 font-medium"
+            icon={Plus}
+            shortText="Добавить"
           >
-            <Plus className="h-4 w-4" />
-            {t('advertiser.create_new')}
-          </button>
-        </motion.div>
-      )}
+            Добавить рекламодателя
+          </ActionButton>
+        }
+      />
 
-      {/* Create Form Modal */}
-      {showCreateForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CreateAdvertiserForm
-              onSubmit={handleCreateAdvertiser}
-              onClose={() => setShowCreateForm(false)}
-            />
-          </div>
-        </div>
-      )}
-    </motion.div>
+      <div className="space-y-6">
+        {/* Filters */}
+        <SearchFilters
+          searchTerm={searchTerm}
+          onSearchChange={(value) => {
+            setSearchTerm(value)
+            setCurrentPage(1)
+          }}
+          searchPlaceholder="Поиск по названию, ИНН..."
+          statusFilter={statusFilter}
+          onStatusChange={(value) => {
+            setStatusFilter(value)
+            setCurrentPage(1)
+          }}
+        />
+
+        {/* Advertisers Table */}
+        <DataTable
+          data={paginatedAdvertisers}
+          columns={columns}
+          mobileCardView={true}
+          emptyMessage={
+            searchTerm || statusFilter !== 'all' 
+              ? 'Рекламодатели не найдены' 
+              : 'Пока нет рекламодателей'
+          }
+        />
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            className="mt-8"
+          />
+        )}
+      </div>
+
+      {/* Create Advertiser Form */}
+      <CreateAdvertiserForm
+        isOpen={showCreateForm}
+        onClose={() => setShowCreateForm(false)}
+        onSubmit={handleCreateAdvertiser}
+      />
+    </>
   )
 }
 

@@ -23,29 +23,29 @@ const ModernStatCards: React.FC<ModernStatCardsProps> = ({ data, className }) =>
         return {
           bg: 'bg-emerald-50',
           border: 'border-emerald-200',
-          progress: 'bg-emerald-500',
-          text: 'text-emerald-700'
+          progress: 'bg-emerald-400',
+          text: 'text-emerald-600'
         }
       case 'red':
         return {
-          bg: 'bg-red-50',
-          border: 'border-red-200', 
-          progress: 'bg-red-500',
-          text: 'text-red-700'
+          bg: 'bg-rose-50',
+          border: 'border-rose-200', 
+          progress: 'bg-rose-400',
+          text: 'text-rose-600'
         }
       case 'blue':
         return {
-          bg: 'bg-blue-50',
-          border: 'border-blue-200',
-          progress: 'bg-blue-500', 
-          text: 'text-blue-700'
+          bg: 'bg-sky-50',
+          border: 'border-sky-200',
+          progress: 'bg-sky-400', 
+          text: 'text-sky-600'
         }
       default:
         return {
-          bg: 'bg-gray-50',
-          border: 'border-gray-200',
-          progress: 'bg-gray-500',
-          text: 'text-gray-700'
+          bg: 'bg-slate-50',
+          border: 'border-slate-200',
+          progress: 'bg-slate-400',
+          text: 'text-slate-600'
         }
     }
   }
