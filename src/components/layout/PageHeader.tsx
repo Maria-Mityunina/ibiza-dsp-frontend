@@ -9,6 +9,7 @@ interface PageHeaderProps {
   backPath?: string
   actionButton?: React.ReactNode
   className?: string
+  fullWidth?: boolean
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
@@ -16,9 +17,60 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   subtitle,
   backPath,
   actionButton,
-  className = ''
+  className = '',
+  fullWidth = false
 }) => {
   const navigate = useNavigate()
+
+  if (fullWidth) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`relative z-10 w-full ${className}`}
+      >
+        <div className="w-full">
+          <div className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                {backPath && (
+                  <button
+                    onClick={() => navigate(backPath)}
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Назад
+                  </button>
+                )}
+                <div>
+                  <h1 
+                    className="text-xl sm:text-2xl lg:text-3xl font-normal text-gray-900"
+                    style={{ fontFamily: 'Montserrat, sans-serif' }}
+                  >
+                    {title}
+                  </h1>
+                  {subtitle && (
+                    <p 
+                      className="text-sm text-gray-600 mt-1 font-normal"
+                      style={{ fontFamily: 'Montserrat, sans-serif' }}
+                    >
+                      {subtitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              {actionButton && (
+                <div className="flex-shrink-0">
+                  {actionButton}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
 
   return (
     <motion.div

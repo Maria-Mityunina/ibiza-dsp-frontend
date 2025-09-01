@@ -220,11 +220,12 @@ const AnalyticsPage: React.FC = () => {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+    return (
+    <>
+      {/* Header - Full Width */}
       <PageHeader
         title="Analytics"
+        fullWidth={true}
         actionButton={
           <div className="flex items-center gap-3">
             {/* Plan Upgrade Button */}
@@ -241,12 +242,12 @@ const AnalyticsPage: React.FC = () => {
                 <ChevronDown className="w-4 h-4" />
               </button>
               <div className="absolute top-full right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-20 min-w-[140px]">
-          <button 
+		          <button 
                   onClick={() => handleExport('csv')}
                   className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl transition-colors"
                 >
                   Export CSV
-          </button>
+		          </button>
             <button 
                   onClick={() => handleExport('xlsx')}
                   className="block w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors"
@@ -259,24 +260,24 @@ const AnalyticsPage: React.FC = () => {
                 >
                   Export PDF
             </button>
-          </div>
-        </div>
+		          </div>
+	        </div>
           </div>
         }
       />
 
-      <div className="pb-6 space-y-6">
+      <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-6 space-y-6">
                 {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <span>Dashboards</span>
           <ChevronDown className="w-4 h-4 transform rotate-[-90deg]" />
           <span className="text-gray-900 font-medium">Analytics</span>
-        </div>
+      </div>
 
                 {/* Top KPI Cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {kpiData.map((kpi, index) => (
@@ -1012,7 +1013,7 @@ const AnalyticsPage: React.FC = () => {
           </div>
         </motion.div>
       </div>
-    </div>
+    </>
   )
 }
 

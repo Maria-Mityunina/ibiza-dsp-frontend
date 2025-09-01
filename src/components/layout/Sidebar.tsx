@@ -1,220 +1,288 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { X, Users, BarChart3, Layers, ChevronDown, Palette, Target, TrendingUp, Shield } from 'lucide-react'
-import { useAuthStore } from '@stores/authStore'
-import { useUIStore } from '@stores/uiStore'
-import { useLanguageStore } from '@stores/languageStore'
-import clsx from 'clsx'
+import { 
+  Users, 
+  Target, 
+  TrendingUp, 
+  ChevronLeft,
+  ChevronRight,
+  X,
+  BarChart3,
+  ImageIcon,
+  Home,
+  Settings,
+  Zap,
+  LayoutDashboard,
+  HelpCircle,
+  LogOut
+} from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface SidebarProps {
-  open: boolean
-  setOpen: (open: boolean) => void
+  isOpen: boolean
+  setIsOpen: (isOpen: boolean) => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ open, setOpen }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const location = useLocation()
-  const { hasPermission } = useAuthStore()
-  const { } = useUIStore()
-  const { t } = useLanguageStore()
-  const [expandedSections, setExpandedSections] = React.useState<string[]>(['main', 'segments', 'analytics'])
 
-  const menuSections = [
+  const mainNavigation = [
     {
-      id: 'main',
-      title: t('nav.main', 'Основные'),
-      items: [
-        {
-          name: t('nav.advertisers', 'Рекламодатели'),
-          href: '/advertisers',
-          icon: Users,
-          permission: 'view_advertisers',
-        }
-      ]
+      name: 'Dashboard',
+      href: '/analytics',
+      icon: LayoutDashboard,
+      current: location.pathname.startsWith('/analytics')
     },
     {
-      id: 'segments',
-      title: t('nav.segments', 'Сегменты'),
-      items: [
-        {
-          name: t('nav.segments', 'Сегменты'),
-          href: '/segments',
-          icon: Target,
-          permission: 'view_segments',
-        }
-      ]
+      name: 'Рекламодатели',
+      href: '/advertisers',
+      icon: Users,
+      current: location.pathname.startsWith('/advertisers')
     },
     {
-      id: 'analytics',
-      title: t('nav.analytics', 'Статистика'),
-      items: [
-        {
-          name: t('nav.analytics', 'Статистика'),
-          href: '/analytics',
-          icon: TrendingUp,
-          permission: 'view_analytics',
-        }
-      ]
+      name: 'Кампании',
+      href: '/campaigns',
+      icon: BarChart3,
+      current: location.pathname.startsWith('/campaigns')
     }
   ]
 
-  const isActive = (href: string) => {
-    return location.pathname === href || location.pathname.startsWith(href + '/')
-  }
+  const managementNavigation = [
+    {
+      name: 'Сегменты',
+      href: '/segments',
+      icon: Target,
+      current: location.pathname.startsWith('/segments')
+    },
+    {
+      name: 'Креативы',
+      href: '/creatives',
+      icon: ImageIcon,
+      current: location.pathname.startsWith('/creatives')
+    }
+  ]
 
-  const toggleSection = (sectionId: string) => {
-    setExpandedSections(prev => 
-      prev.includes(sectionId) 
-        ? prev.filter(id => id !== sectionId)
-        : [...prev, sectionId]
-    )
-  }
+  const integrationNavigation = [
+    {
+      name: 'Статистика',
+      href: '/analytics',
+      icon: TrendingUp,
+      current: location.pathname.startsWith('/analytics')
+    }
+  ]
 
   return (
-                <>
-              {/* Mobile backdrop */}
-              {open && (
-                <div
-                  className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm transition-opacity lg:hidden z-20"
-                  onClick={() => setOpen(false)}
-                />
-              )}
-
-                    {/* Sidebar */}
-      <motion.div
-        className={clsx(
-          'h-full w-72 flex-shrink-0 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:z-auto',
-          'fixed inset-y-0 left-0 z-30 lg:static',
-          open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+    <>
+      {/* Mobile backdrop */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsOpen(false)}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
+          />
         )}
+      </AnimatePresence>
+
+      {/* Sidebar */}
+      <motion.aside
+        initial={false}
+        animate={{
+          x: isOpen ? 0 : '-100%'
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30
+        }}
+        className={`
+          h-screen w-64 
+          fixed left-0 top-0 z-50
+          transition-transform duration-300
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+        style={{
+          background: `
+            linear-gradient(135deg, 
+              rgba(255, 255, 255, 0.25) 0%, 
+              rgba(255, 255, 255, 0.15) 50%,
+              rgba(255, 255, 255, 0.1) 100%
+            )
+          `,
+          backdropFilter: 'blur(20px)',
+          boxShadow: `
+            0 25px 50px -12px rgba(0, 0, 0, 0.25),
+            0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+            0 1px 0 0 rgba(255, 255, 255, 0.3) inset
+          `,
+          borderRight: '1px solid rgba(255, 255, 255, 0.3)'
+        }}
       >
-        {/* White background like header */}
-        <div className="absolute inset-0 bg-white border-r border-gray-200 lg:shadow-none shadow-xl"></div>
-        
-        <div className="relative h-full flex flex-col p-2">
-          {/* Header */}
-          <div className="flex items-center justify-between h-20 px-6">
-            <div className="flex-1 flex justify-center">
-                                <h1 className="text-3xl font-light text-black">IBIZA DSP</h1>
-            </div>
-            
-            {/* Close button for mobile */}
-            <button
-              className="lg:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 absolute right-4 transition-colors"
-              onClick={() => setOpen(false)}
+              {/* Header */}
+      <div className="flex items-center justify-between p-6 border-b border-white/20">
+        <Link to="/advertisers" className="flex items-center space-x-3 group">
+          <div>
+            <h2 
+              className="text-2xl font-light text-gray-900 group-hover:text-gray-700 transition-colors"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
             >
-              <X className="h-6 w-6" />
-            </button>
+              Ibiza DSP
+            </h2>
+            <p 
+              className="text-sm text-gray-600 font-light"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              Dashboard
+            </p>
           </div>
+        </Link>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-6 py-4 space-y-4 overflow-y-auto scrollbar-hide">
-            {menuSections.map((section) => {
-              const isExpanded = expandedSections.includes(section.id)
+          {/* Toggle arrow */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 rounded-lg hover:bg-white/20 transition-colors"
+          >
+            {isOpen ? (
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
+            ) : (
+              <ChevronRight className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
+        </div>
 
+        {/* Navigation */}
+        <nav className="flex-1 p-4 space-y-6">
+          {/* Main Navigation */}
+          <div className="space-y-2">
+            <h3 
+              className="px-3 py-2 text-xs font-light text-gray-500 uppercase tracking-wider"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              ОСНОВНОЕ
+            </h3>
+            {mainNavigation.map((item) => {
+              const Icon = item.icon
               return (
-                <div key={section.id}>
-                  {/* Section header - только в развернутом состоянии */}
-                  {!false && (
-                    <div 
-                      className="flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 cursor-pointer hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-100"
-                      onClick={() => toggleSection(section.id)}
-                    >
-                      <span>{section.title}</span>
-                      <ChevronDown 
-                        className={clsx(
-                          'h-4 w-4 transition-transform duration-300',
-                          isExpanded ? 'transform rotate-180' : ''
-                        )}
-                      />
-                    </div>
-                  )}
+                <Link
+                  key={item.name}
+                  to={item.href}
 
-                  {/* Свернутое состояние - показываем заголовок секции сокращенно */}
-                  {false && (
-                    <div className="px-3 py-2 text-center">
-                      <span className="text-xs font-semibold text-gray-500 font-['Montserrat']">
-                        {section.title.slice(0, 5)}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Section items */}
-                  {(isExpanded || false) && (
-                    <div className={clsx(
-                      'space-y-2',
-                      false ? 'ml-0' : 'ml-4 mt-3'
-                    )}>
-                      {section.items.map((item) => {
-                        if (item.permission && !hasPermission(item.permission as any)) {
-                          return null
-                        }
-
-                        const Icon = item.icon
-                        const active = isActive(item.href)
-
-                        return (
-                          <Link
-                            key={item.name}
-                            to={item.href}
-                            className={clsx(
-                              'group flex items-center text-sm font-medium rounded-lg transition-colors relative',
-                              false ? 'px-3 py-3 justify-center' : 'px-4 py-3',
-                              active
-                                ? 'bg-slate-100 text-slate-900 border-l-4 border-slate-900'
-                                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                            )}
-                            onClick={() => setOpen(false)}
-                            title={false ? item.name : undefined}
-                          >
-                            <Icon
-                              className={clsx(
-                                'h-5 w-5 transition-colors',
-                                false ? 'mr-0' : 'mr-3',
-                                active ? 'text-slate-900' : 'text-gray-600 group-hover:text-gray-900'
-                              )}
-                            />
-                            <AnimatePresence>
-                              {!false && (
-                                <motion.span
-                                  initial={{ opacity: 0, width: 0 }}
-                                  animate={{ opacity: 1, width: 'auto' }}
-                                  exit={{ opacity: 0, width: 0 }}
-                                  transition={{ duration: 0.2 }}
-                                  className="overflow-hidden whitespace-nowrap"
-                                >
-                                  {item.name}
-                                </motion.span>
-                              )}
-                            </AnimatePresence>
-                          </Link>
+                  className={`
+                    group flex items-center px-3 py-3 text-sm font-light rounded-xl transition-all duration-200 relative overflow-hidden
+                    ${item.current 
+                      ? 'text-white shadow-lg' 
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-white/20'
+                    }
+                  `}
+                  style={{ 
+                    fontFamily: 'Montserrat, sans-serif',
+                    ...(item.current && {
+                      background: `
+                        linear-gradient(135deg, 
+                          rgba(17, 24, 39, 1) 0%, 
+                          rgba(31, 41, 55, 1) 100%
                         )
-                      })}
-                    </div>
+                      `,
+                      boxShadow: `
+                        0 8px 25px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(255, 255, 255, 0.2) inset
+                      `
+                    })
+                  }}
+                >
+                  <Icon className={`
+                    mr-3 h-5 w-5 transition-all duration-200
+                    ${item.current ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'}
+                  `} />
+                  <span className="flex-1">{item.name}</span>
+                  
+                  {/* Hover effect */}
+                  {!item.current && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
                   )}
-                </div>
+                </Link>
               )
             })}
-          </nav>
+          </div>
 
-          {/* Footer */}
-          <div className="px-6 py-6 border-t border-gray-200 mt-auto">
-            <AnimatePresence>
-              {!false && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-xs text-gray-500 text-center font-medium font-['Montserrat']"
+          {/* Management Navigation */}
+          <div className="space-y-2">
+            <h3 
+              className="px-3 py-2 text-xs font-light text-gray-500 uppercase tracking-wider"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              УПРАВЛЕНИЕ
+            </h3>
+            {managementNavigation.map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+
+                  className={`
+                    group flex items-center px-3 py-3 text-sm font-light rounded-xl transition-all duration-200 relative overflow-hidden
+                    ${item.current 
+                      ? 'text-white shadow-lg' 
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-white/20'
+                    }
+                  `}
+                  style={{ 
+                    fontFamily: 'Montserrat, sans-serif',
+                    ...(item.current && {
+                      background: `
+                        linear-gradient(135deg, 
+                          rgba(17, 24, 39, 1) 0%, 
+                          rgba(31, 41, 55, 1) 100%
+                        )
+                      `,
+                      boxShadow: `
+                        0 8px 25px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(255, 255, 255, 0.2) inset
+                      `
+                    })
+                  }}
                 >
-                  © 2025 Ibiza DSP
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <Icon className={`
+                    mr-3 h-5 w-5 transition-all duration-200
+                    ${item.current ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'}
+                  `} />
+                  <span className="flex-1">{item.name}</span>
+                  
+                  {/* Hover effect */}
+                  {!item.current && (
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-100/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500" />
+                  )}
+                </Link>
+              )
+            })}
+          </div>
+        </nav>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-white/20">
+          <div className="space-y-2">
+            <button 
+              className="w-full flex items-center px-3 py-3 text-sm font-light text-gray-600 hover:text-gray-900 hover:bg-white/20 rounded-xl transition-all duration-200 group"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              <HelpCircle className="mr-3 h-5 w-5 text-gray-500 group-hover:text-gray-700 transition-colors duration-200" />
+              <span>Помощь</span>
+            </button>
+            <button 
+              className="w-full flex items-center px-3 py-3 text-sm font-light text-gray-600 hover:text-gray-900 hover:bg-white/20 rounded-xl transition-all duration-200 group"
+              style={{ fontFamily: 'Montserrat, sans-serif' }}
+            >
+              <Settings className="mr-3 h-5 w-5 text-gray-500 group-hover:text-gray-700 transition-colors duration-200" />
+              <span>Настройки</span>
+            </button>
           </div>
         </div>
-      </motion.div>
+      </motion.aside>
+
+
     </>
   )
 }

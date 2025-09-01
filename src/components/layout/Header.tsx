@@ -1,26 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { Bell, Settings, ChevronDown, User, LogOut, Zap, Users, Target, TrendingUp, HelpCircle } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Bell, Settings, ChevronDown, User, LogOut, Zap, HelpCircle, ChevronRight } from 'lucide-react'
 import { useAuthStore } from '@stores/authStore'
 import { useLanguageStore } from '@stores/languageStore'
 import { motion, AnimatePresence } from 'framer-motion'
 
-interface HeaderProps {}
+interface HeaderProps {
+  sidebarOpen: boolean
+  setSidebarOpen: (open: boolean) => void
+}
 
-const Header: React.FC<HeaderProps> = () => {
-  const location = useLocation()
+const Header: React.FC<HeaderProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const { user, logout } = useAuthStore()
   const { language, setLanguage, t } = useLanguageStore()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
 
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const settingsDropdownRef = useRef<HTMLDivElement>(null)
+  const notificationsDropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (settingsDropdownRef.current && !settingsDropdownRef.current.contains(event.target as Node)) {
         setIsSettingsOpen(false)
+      }
+      if (notificationsDropdownRef.current && !notificationsDropdownRef.current.contains(event.target as Node)) {
         setIsNotificationsOpen(false)
       }
     }
@@ -38,27 +43,6 @@ const Header: React.FC<HeaderProps> = () => {
     logout()
     setIsSettingsOpen(false)
   }
-
-  const navigation = [
-    {
-      name: 'Рекламодатели',
-      href: '/advertisers',
-      icon: Users,
-      current: location.pathname.startsWith('/advertisers')
-    },
-    {
-      name: 'Сегменты',
-      href: '/segments',
-      icon: Target,
-      current: location.pathname.startsWith('/segments')
-    },
-    {
-      name: 'Статистика',
-      href: '/analytics',
-      icon: TrendingUp,
-      current: location.pathname.startsWith('/analytics')
-    }
-  ]
 
   return (
     <header 
@@ -80,89 +64,45 @@ const Header: React.FC<HeaderProps> = () => {
     >
       
       <div className="w-full">
-        <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 xxl:px-16 flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link to="/advertisers" className="flex items-center space-x-3 group/logo">
-              <div className="relative">
-                <div 
-                  className="w-8 h-8 bg-gradient-to-r from-gray-900 to-gray-700 rounded-lg flex items-center justify-center shadow-lg relative overflow-hidden"
-                  style={{
-                    boxShadow: `
-                      0 2px 12px rgba(0, 0, 0, 0.15),
-                      0 0 0 1px rgba(255, 255, 255, 0.1) inset
-                    `
-                  }}
-                >
-                  <Zap className="w-5 h-5 text-white relative z-10 transition-transform duration-300 group-hover/logo:scale-110" />
-                  {/* Shimmer effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/logo:translate-x-full transition-transform duration-500" />
-                </div>
-                <div 
-                  className="absolute -top-1 -right-1 w-3 h-3 bg-gray-800 rounded-full opacity-80"
-                />
-              </div>
-              <span 
-                className="text-xl font-medium text-gray-900 transition-colors duration-300 group-hover/logo:text-gray-700"
-                style={{ fontFamily: 'Montserrat, sans-serif' }}
+        <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+          {/* Left side - Toggle button and Logo */}
+          <div className="flex items-center space-x-4">
+            {/* Toggle button when sidebar is closed */}
+            {!sidebarOpen && (
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
               >
-                Ibiza DSP
-              </span>
-            </Link>
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            )}
+            
+            {/* Logo from sidebar when it's closed */}
+            {!sidebarOpen && (
+              <Link to="/advertisers" className="group">
+                <h2
+                  className="text-xl font-light text-gray-900 group-hover:text-gray-700 transition-colors"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
+                >
+                  Ibiza DSP
+                </h2>
+                <p
+                  className="text-xs text-gray-600 font-light"
+                  style={{ fontFamily: 'Montserrat, sans-serif' }}
+                >
+                  Dashboard
+                </p>
+              </Link>
+            )}
           </div>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
-            {navigation.map((item) => {
-              const Icon = item.icon
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`relative flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 group/nav overflow-hidden ${
-                    item.current
-                      ? 'text-slate-900 bg-white/20 backdrop-blur-md border border-white/30 shadow-lg'
-                      : 'text-gray-600 hover:text-slate-900 hover:bg-white/15 hover:backdrop-blur-md hover:border hover:border-white/20'
-                  }`}
-                  style={item.current ? {
-                    background: `
-                      linear-gradient(135deg, 
-                        rgba(255, 255, 255, 0.25) 0%, 
-                        rgba(255, 255, 255, 0.1) 100%
-                      )
-                    `,
-                    boxShadow: `
-                      0 4px 20px rgba(0,0,0,0.1),
-                      0 1px 0 rgba(255,255,255,0.2) inset
-                    `
-                  } : {}}
-                >
-                  {/* Shimmer effect on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/nav:translate-x-full transition-transform duration-700" />
-                  
-                  <Icon className={`w-4 h-4 relative z-10 transition-all duration-300 ${
-                    item.current 
-                      ? 'text-slate-900' 
-                      : 'group-hover/nav:scale-110 group-hover/nav:rotate-6'
-                  }`} />
-                  <span className="relative z-10">{item.name}</span>
-                  
-                  {item.current && (
-                    <motion.div
-                      layoutId="nav-indicator"
-                      className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-gray-900 rounded-full"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              )
-            })}
-          </nav>
+          {/* Center space */}
+          <div className="flex-1"></div>
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
             {/* Notifications */}
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative" ref={notificationsDropdownRef}>
               <button 
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
                 className="relative p-2 text-gray-600 hover:text-gray-800 hover:bg-white/20 rounded-lg transition-all duration-200"
@@ -236,7 +176,7 @@ const Header: React.FC<HeaderProps> = () => {
             </div>
 
             {/* Settings Dropdown */}
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative" ref={settingsDropdownRef}>
               <button
                 onClick={() => setIsSettingsOpen(!isSettingsOpen)}
                 className="flex items-center space-x-2 p-2 text-gray-600 hover:text-gray-800 hover:bg-white/20 rounded-lg transition-all duration-200"
@@ -245,10 +185,10 @@ const Header: React.FC<HeaderProps> = () => {
                   <User className="w-4 h-4 text-white" />
                 </div>
                 <div className="hidden lg:block text-left">
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-light text-gray-900" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                     {user?.username || 'DSP Manager'}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 font-light" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                     {user?.role || 'Administrator'}
                   </p>
                 </div>
@@ -271,10 +211,10 @@ const Header: React.FC<HeaderProps> = () => {
                           <User className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">
+                          <p className="text-sm font-light text-gray-900" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                             {user?.username || 'User'}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 font-light" style={{ fontFamily: 'Montserrat, sans-serif' }}>
                             {user?.email || 'user@example.com'}
                           </p>
                         </div>
@@ -353,30 +293,7 @@ const Header: React.FC<HeaderProps> = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
-      <div className="md:hidden border-t border-white/20 bg-white/10 backdrop-blur-md">
-        <div className="px-4 py-2">
-          <nav className="flex space-x-1">
-            {navigation.map((item) => {
-              const Icon = item.icon
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex-1 flex flex-col items-center justify-center px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 ${
-                    item.current
-                      ? 'text-slate-900 bg-white/30'
-                      : 'text-gray-700 hover:text-slate-900 hover:bg-white/20'
-                  }`}
-                >
-                  <Icon className="w-5 h-5 mb-1" />
-                  <span>{item.name}</span>
-                </Link>
-              )
-            })}
-          </nav>
-        </div>
-      </div>
+
     </header>
   )
 }

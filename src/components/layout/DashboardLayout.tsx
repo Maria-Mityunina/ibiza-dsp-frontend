@@ -1,13 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ScrollButtons, ToastContainer } from '@components/ui'
 import Breadcrumb from './Breadcrumb'
 import Header from './Header'
+import Sidebar from './Sidebar'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+
   return (
     <div className="min-h-screen relative overflow-x-hidden">
       {/* Clean Monochrome Background */}
@@ -56,27 +59,30 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         />
       </div>
       
-      {/* Main Layout Container with Glass Effect */}
-      <div className="relative flex flex-col min-h-screen">
-        {/* Header with enhanced glass effect */}
-        <div className="relative z-50">
-          <Header />
+      {/* Sidebar - always rendered, fixed position */}
+      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+      
+      {/* Main Content with margin when sidebar is open - only on desktop */}
+      <div className={`flex flex-col min-h-screen transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : ''}`}>
+        {/* Header */}
+        <div className="relative z-40">
+          <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         </div>
         
         {/* Page content */}
         <main className="flex-1 relative z-10">
-          {/* Breadcrumb - transparent */}
+          {/* Breadcrumb */}
           <div className="w-full">
-            <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 xxl:px-16 py-4 sm:py-6">
+            <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
               <div className="text-gray-700">
                 <Breadcrumb />
               </div>
             </div>
           </div>
           
-          {/* Page content - properly centered */}
+          {/* Page content */}
           <div className="w-full">
-            <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 xxl:px-16 pb-6">
+            <div className="max-w-7xl xxl:max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
               {children}
             </div>
           </div>
